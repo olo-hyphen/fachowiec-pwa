@@ -8,6 +8,7 @@ import Jobs from "./pages/Jobs";
 import TimeTracking from "./pages/TimeTracking";
 import Photos from "./pages/Photos";
 import Navbar from "./components/layout/Navbar";
+import MobileNavigation from "./components/layout/MobileNavigation";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -20,16 +21,19 @@ const App = () => (
       <BrowserRouter>
         <div className="min-h-screen bg-background">
           <Navbar />
-          <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/jobs" element={<Jobs />} />
-            <Route path="/time-tracking" element={<TimeTracking />} />
-            <Route path="/photos" element={<Photos />} />
-            <Route path="/estimates" element={<div className="p-8"><h1 className="text-2xl">Kosztorysy - W przygotowaniu</h1></div>} />
-            <Route path="/reports" element={<div className="p-8"><h1 className="text-2xl">Raporty - W przygotowaniu</h1></div>} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <main className="pb-20 md:pb-0">
+            <Routes>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/jobs" element={<Jobs />} />
+              <Route path="/time-tracking" element={<TimeTracking />} />
+              <Route path="/photos" element={<Photos />} />
+              <Route path="/estimates" element={<div className="p-4 md:p-8"><h1 className="text-2xl font-poppins">Kosztorysy - W przygotowaniu</h1></div>} />
+              <Route path="/reports" element={<div className="p-4 md:p-8"><h1 className="text-2xl font-poppins">Raporty - W przygotowaniu</h1></div>} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </main>
+          <MobileNavigation />
         </div>
       </BrowserRouter>
     </TooltipProvider>
