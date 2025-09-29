@@ -1,13 +1,14 @@
 import { NavLink } from "react-router-dom";
-import { Home, Briefcase, Clock, Camera, Plus } from "lucide-react";
+import { Home, Briefcase, Users, FileText, Calendar, Plus, Clock } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: Home },
   { name: "Zlecenia", href: "/jobs", icon: Briefcase },
-  { name: "Czas", href: "/time-tracking", icon: Clock },
-  { name: "Zdjęcia", href: "/photos", icon: Camera },
+  { name: "Klienci", href: "/clients", icon: Users },
+  { name: "Kosztorysy", href: "/estimates", icon: FileText },
+  { name: "Kalendarz", href: "/calendar", icon: Calendar },
 ];
 
 export default function MobileNavigation() {

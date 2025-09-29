@@ -14,7 +14,243 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      clients: {
+        Row: {
+          address: string | null
+          created_at: string
+          email: string | null
+          id: string
+          name: string
+          notes: string | null
+          phone: string | null
+          rating: number | null
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          phone?: string | null
+          rating?: number | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          phone?: string | null
+          rating?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      cost_estimates: {
+        Row: {
+          client_id: string | null
+          created_at: string
+          description: string | null
+          id: string
+          items: Json
+          status: string
+          subtotal: number
+          tax_amount: number
+          tax_rate: number
+          title: string
+          total_amount: number
+          updated_at: string
+          valid_until: string | null
+        }
+        Insert: {
+          client_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          items?: Json
+          status?: string
+          subtotal?: number
+          tax_amount?: number
+          tax_rate?: number
+          title: string
+          total_amount?: number
+          updated_at?: string
+          valid_until?: string | null
+        }
+        Update: {
+          client_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          items?: Json
+          status?: string
+          subtotal?: number
+          tax_amount?: number
+          tax_rate?: number
+          title?: string
+          total_amount?: number
+          updated_at?: string
+          valid_until?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cost_estimates_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      jobs: {
+        Row: {
+          actual_cost: number | null
+          client_id: string | null
+          completed_at: string | null
+          created_at: string
+          description: string | null
+          estimate_id: string | null
+          estimated_hours: number | null
+          hourly_rate: number | null
+          id: string
+          notes: string | null
+          priority: string
+          scheduled_date: string | null
+          status: string
+          title: string
+          total_cost: number | null
+          updated_at: string
+        }
+        Insert: {
+          actual_cost?: number | null
+          client_id?: string | null
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          estimate_id?: string | null
+          estimated_hours?: number | null
+          hourly_rate?: number | null
+          id?: string
+          notes?: string | null
+          priority?: string
+          scheduled_date?: string | null
+          status?: string
+          title: string
+          total_cost?: number | null
+          updated_at?: string
+        }
+        Update: {
+          actual_cost?: number | null
+          client_id?: string | null
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          estimate_id?: string | null
+          estimated_hours?: number | null
+          hourly_rate?: number | null
+          id?: string
+          notes?: string | null
+          priority?: string
+          scheduled_date?: string | null
+          status?: string
+          title?: string
+          total_cost?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "jobs_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "jobs_estimate_id_fkey"
+            columns: ["estimate_id"]
+            isOneToOne: false
+            referencedRelation: "cost_estimates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      photos: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          job_id: string | null
+          type: string
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          job_id?: string | null
+          type: string
+          url: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          job_id?: string | null
+          type?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "photos_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      time_entries: {
+        Row: {
+          created_at: string
+          description: string | null
+          duration: number | null
+          end_time: string | null
+          id: string
+          job_id: string | null
+          start_time: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          duration?: number | null
+          end_time?: string | null
+          id?: string
+          job_id?: string | null
+          start_time: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          duration?: number | null
+          end_time?: string | null
+          id?: string
+          job_id?: string | null
+          start_time?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "time_entries_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

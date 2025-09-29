@@ -5,7 +5,9 @@ import {
   Briefcase, 
   Clock, 
   Camera, 
-  Calculator,
+  Users,
+  FileText,
+  Calendar as CalendarIcon,
   BarChart3,
   Menu
 } from 'lucide-react';
@@ -15,9 +17,11 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 const navigation = [
   { name: 'Dashboard', href: '/', icon: Home },
   { name: 'Zlecenia', href: '/jobs', icon: Briefcase },
+  { name: 'Klienci', href: '/clients', icon: Users },
+  { name: 'Kosztorysy', href: '/estimates', icon: FileText },
+  { name: 'Kalendarz', href: '/calendar', icon: CalendarIcon },
   { name: 'Czas pracy', href: '/time-tracking', icon: Clock },
   { name: 'Zdjęcia', href: '/photos', icon: Camera },
-  { name: 'Kosztorysy', href: '/estimates', icon: Calculator },
   { name: 'Raporty', href: '/reports', icon: BarChart3 },
 ];
 
