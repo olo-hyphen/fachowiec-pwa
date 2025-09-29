@@ -8,17 +8,20 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { getJobs, saveJob, deleteJob } from '@/lib/storage';
-import { Job, JobStatus } from '@/types';
+import { Job, JobStatus, JobPriority } from '@/types';
 import { 
   Plus, 
   Search, 
-  MoreHorizontal, 
   Edit,
   Trash2,
   CheckCircle,
   Clock,
   AlertCircle,
-  Activity
+  Activity,
+  ArrowUpDown,
+  Flag,
+  Calendar,
+  Tag
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -27,6 +30,8 @@ export default function Jobs() {
   const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [priorityFilter, setPriorityFilter] = useState<string>('all');
+  const [sortBy, setSortBy] = useState<string>('date-desc');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingJob, setEditingJob] = useState<Job | null>(null);
   const { toast } = useToast();
@@ -41,7 +46,10 @@ export default function Jobs() {
     estimatedHours: '',
     hourlyRate: '',
     category: '',
-    status: 'pending' as JobStatus
+    status: 'pending' as JobStatus,
+    priority: 'medium' as JobPriority,
+    tags: '',
+    notes: ''
   });
 
   useEffect(() => {
@@ -50,7 +58,7 @@ export default function Jobs() {
 
   useEffect(() => {
     filterJobs();
-  }, [jobs, searchTerm, statusFilter]);
+  }, [jobs, searchTerm, statusFilter, priorityFilter, sortBy]);
 
   const loadJobs = () => {
     const allJobs = getJobs();
@@ -64,13 +72,39 @@ export default function Jobs() {
       filtered = filtered.filter(job =>
         job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         job.clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        job.address.toLowerCase().includes(searchTerm.toLowerCase())
+        job.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        job.category?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
     if (statusFilter !== 'all') {
       filtered = filtered.filter(job => job.status === statusFilter);
     }
+
+    if (priorityFilter !== 'all') {
+      filtered = filtered.filter(job => job.priority === priorityFilter);
+    }
+
+    // Sortowanie
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case 'date-desc':
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        case 'date-asc':
+          return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+        case 'priority':
+          const priorityOrder = { urgent: 4, high: 3, medium: 2, low: 1 };
+          return (priorityOrder[b.priority || 'medium'] || 0) - (priorityOrder[a.priority || 'medium'] || 0);
+        case 'cost-desc':
+          return b.totalCost - a.totalCost;
+        case 'cost-asc':
+          return a.totalCost - b.totalCost;
+        case 'name':
+          return a.title.localeCompare(b.title);
+        default:
+          return 0;
+      }
+    });
 
     setFilteredJobs(filtered);
   };
@@ -86,7 +120,10 @@ export default function Jobs() {
       estimatedHours: '',
       hourlyRate: '',
       category: '',
-      status: 'pending'
+      status: 'pending',
+      priority: 'medium',
+      tags: '',
+      notes: ''
     });
     setEditingJob(null);
   };
@@ -118,7 +155,10 @@ export default function Jobs() {
       hourlyRate,
       totalCost: estimatedHours * hourlyRate,
       status: formData.status,
+      priority: formData.priority,
       category: formData.category,
+      tags: formData.tags ? formData.tags.split(',').map(t => t.trim()).filter(Boolean) : [],
+      notes: formData.notes,
       createdAt: editingJob?.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       ...(formData.status === 'completed' && !editingJob?.completedAt && {
@@ -149,7 +189,10 @@ export default function Jobs() {
       estimatedHours: job.estimatedHours.toString(),
       hourlyRate: job.hourlyRate.toString(),
       category: job.category || '',
-      status: job.status
+      status: job.status,
+      priority: job.priority || 'medium',
+      tags: job.tags?.join(', ') || '',
+      notes: job.notes || ''
     });
     setIsDialogOpen(true);
   };
@@ -204,6 +247,53 @@ export default function Jobs() {
     }
   };
 
+  const getPriorityIcon = (priority?: JobPriority) => {
+    switch (priority) {
+      case 'urgent':
+        return <Flag className="h-3 w-3 text-destructive fill-destructive" />;
+      case 'high':
+        return <Flag className="h-3 w-3 text-destructive" />;
+      case 'medium':
+        return <Flag className="h-3 w-3 text-warning" />;
+      case 'low':
+        return <Flag className="h-3 w-3 text-muted-foreground" />;
+      default:
+        return <Flag className="h-3 w-3 text-muted-foreground" />;
+    }
+  };
+
+  const getPriorityText = (priority?: JobPriority) => {
+    switch (priority) {
+      case 'urgent':
+        return 'Pilne';
+      case 'high':
+        return 'Wysoki';
+      case 'medium':
+        return 'Średni';
+      case 'low':
+        return 'Niski';
+      default:
+        return 'Średni';
+    }
+  };
+
+  const handleQuickStatusChange = (job: Job, newStatus: JobStatus) => {
+    const updatedJob = {
+      ...job,
+      status: newStatus,
+      updatedAt: new Date().toISOString(),
+      ...(newStatus === 'completed' && !job.completedAt && {
+        completedAt: new Date().toISOString()
+      })
+    };
+    saveJob(updatedJob);
+    loadJobs();
+    toast({
+      title: "Status zaktualizowany",
+      description: `Zlecenie "${job.title}" - ${getStatusText(newStatus)}`
+    });
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -234,16 +324,17 @@ export default function Jobs() {
               </DialogHeader>
 
               <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="title">Tytuł zlecenia *</Label>
-                    <Input
-                      id="title"
-                      value={formData.title}
-                      onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                      placeholder="np. Remont łazienki"
-                    />
-                  </div>
+                <div>
+                  <Label htmlFor="title">Tytuł zlecenia *</Label>
+                  <Input
+                    id="title"
+                    value={formData.title}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    placeholder="np. Remont łazienki"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <Label htmlFor="status">Status</Label>
                     <Select 
@@ -260,6 +351,32 @@ export default function Jobs() {
                         <SelectItem value="cancelled">Anulowane</SelectItem>
                       </SelectContent>
                     </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="priority">Priorytet</Label>
+                    <Select 
+                      value={formData.priority} 
+                      onValueChange={(value: JobPriority) => setFormData({ ...formData, priority: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="low">Niski</SelectItem>
+                        <SelectItem value="medium">Średni</SelectItem>
+                        <SelectItem value="high">Wysoki</SelectItem>
+                        <SelectItem value="urgent">Pilne</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="category">Kategoria</Label>
+                    <Input
+                      id="category"
+                      value={formData.category}
+                      onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                      placeholder="np. Hydraulika"
+                    />
                   </div>
                 </div>
 
@@ -295,26 +412,15 @@ export default function Jobs() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="clientEmail">Email</Label>
-                    <Input
-                      id="clientEmail"
-                      type="email"
-                      value={formData.clientEmail}
-                      onChange={(e) => setFormData({ ...formData, clientEmail: e.target.value })}
-                      placeholder="jan@example.com"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="category">Kategoria</Label>
-                    <Input
-                      id="category"
-                      value={formData.category}
-                      onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                      placeholder="np. Hydraulika, Elektryka"
-                    />
-                  </div>
+                <div>
+                  <Label htmlFor="clientEmail">Email</Label>
+                  <Input
+                    id="clientEmail"
+                    type="email"
+                    value={formData.clientEmail}
+                    onChange={(e) => setFormData({ ...formData, clientEmail: e.target.value })}
+                    placeholder="jan@example.com"
+                  />
                 </div>
 
                 <div>
@@ -350,6 +456,27 @@ export default function Jobs() {
                   </div>
                 </div>
 
+                <div>
+                  <Label htmlFor="tags">Tagi (oddziel przecinkami)</Label>
+                  <Input
+                    id="tags"
+                    value={formData.tags}
+                    onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
+                    placeholder="np. remont, łazienka, pilne"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="notes">Notatki</Label>
+                  <Textarea
+                    id="notes"
+                    value={formData.notes}
+                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                    placeholder="Dodatkowe uwagi i notatki..."
+                    rows={3}
+                  />
+                </div>
+
                 {formData.estimatedHours && formData.hourlyRate && (
                   <div className="p-4 bg-secondary/50 rounded-lg">
                     <p className="text-sm text-muted-foreground">Szacowana wartość zlecenia:</p>
@@ -379,31 +506,78 @@ export default function Jobs() {
         {/* Filters */}
         <Card className="mb-6 shadow-soft">
           <CardContent className="p-6">
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex-1">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Szukaj zleceń..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
-                  />
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col md:flex-row gap-4">
+                <div className="flex-1">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Szukaj zleceń..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger className="w-[160px]">
+                      <SelectValue placeholder="Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Wszystkie</SelectItem>
+                      <SelectItem value="pending">Oczekujące</SelectItem>
+                      <SelectItem value="in-progress">W trakcie</SelectItem>
+                      <SelectItem value="completed">Zakończone</SelectItem>
+                      <SelectItem value="cancelled">Anulowane</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Select value={priorityFilter} onValueChange={setPriorityFilter}>
+                    <SelectTrigger className="w-[160px]">
+                      <SelectValue placeholder="Priorytet" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Wszystkie</SelectItem>
+                      <SelectItem value="urgent">Pilne</SelectItem>
+                      <SelectItem value="high">Wysoki</SelectItem>
+                      <SelectItem value="medium">Średni</SelectItem>
+                      <SelectItem value="low">Niski</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Select value={sortBy} onValueChange={setSortBy}>
+                    <SelectTrigger className="w-[180px]">
+                      <ArrowUpDown className="h-4 w-4 mr-2" />
+                      <SelectValue placeholder="Sortuj" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="date-desc">Najnowsze</SelectItem>
+                      <SelectItem value="date-asc">Najstarsze</SelectItem>
+                      <SelectItem value="priority">Priorytet</SelectItem>
+                      <SelectItem value="cost-desc">Wartość: malejąco</SelectItem>
+                      <SelectItem value="cost-asc">Wartość: rosnąco</SelectItem>
+                      <SelectItem value="name">Nazwa A-Z</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
-              <div className="w-full md:w-48">
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Filtruj po statusie" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Wszystkie</SelectItem>
-                    <SelectItem value="pending">Oczekujące</SelectItem>
-                    <SelectItem value="in-progress">W trakcie</SelectItem>
-                    <SelectItem value="completed">Zakończone</SelectItem>
-                    <SelectItem value="cancelled">Anulowane</SelectItem>
-                  </SelectContent>
-                </Select>
+              
+              <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                <span className="flex items-center gap-1">
+                  Znaleziono: <span className="font-semibold text-foreground">{filteredJobs.length}</span>
+                </span>
+                {(statusFilter !== 'all' || priorityFilter !== 'all' || searchTerm) && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setSearchTerm('');
+                      setStatusFilter('all');
+                      setPriorityFilter('all');
+                    }}
+                  >
+                    Wyczyść filtry
+                  </Button>
+                )}
               </div>
             </div>
           </CardContent>
@@ -412,16 +586,24 @@ export default function Jobs() {
         {/* Jobs List */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredJobs.map((job) => (
-            <Card key={job.id} className="shadow-soft hover:shadow-medium transition-shadow">
+            <Card key={job.id} className="shadow-soft hover:shadow-medium transition-all hover-scale">
               <CardHeader className="pb-3">
-                <div className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <CardTitle className="text-lg mb-2">{job.title}</CardTitle>
+                <div className="flex justify-between items-start gap-2">
+                  <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2">
-                      {getStatusIcon(job.status)}
-                      <Badge variant={getStatusBadgeVariant(job.status)}>
+                      {getPriorityIcon(job.priority)}
+                      <CardTitle className="text-lg truncate">{job.title}</CardTitle>
+                    </div>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <Badge variant={getStatusBadgeVariant(job.status)} className="flex items-center gap-1">
+                        {getStatusIcon(job.status)}
                         {getStatusText(job.status)}
                       </Badge>
+                      {job.priority && job.priority !== 'medium' && (
+                        <Badge variant="outline" className="text-xs">
+                          {getPriorityText(job.priority)}
+                        </Badge>
+                      )}
                     </div>
                   </div>
                   <div className="flex gap-1">
@@ -442,31 +624,82 @@ export default function Jobs() {
                   </div>
                 </div>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
+              <CardContent className="space-y-3">
+                <div>
                   <p className="text-sm text-foreground font-medium">{job.clientName}</p>
                   <p className="text-sm text-muted-foreground">{job.address}</p>
-                  {job.description && (
-                    <p className="text-sm text-muted-foreground line-clamp-2">
-                      {job.description}
+                </div>
+                
+                {job.description && (
+                  <p className="text-sm text-muted-foreground line-clamp-2">
+                    {job.description}
+                  </p>
+                )}
+
+                {job.tags && job.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-1">
+                    {job.tags.map((tag, idx) => (
+                      <Badge key={idx} variant="secondary" className="text-xs">
+                        <Tag className="h-3 w-3 mr-1" />
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+
+                <div className="flex justify-between items-end pt-2 border-t">
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1">
+                      {job.estimatedHours}h × {job.hourlyRate} zł/h
                     </p>
-                  )}
-                  <div className="flex justify-between items-center pt-2">
-                    <div>
-                      <p className="text-sm text-muted-foreground">
-                        {job.estimatedHours}h × {job.hourlyRate} zł/h
-                      </p>
-                      {job.category && (
-                        <Badge variant="outline" className="mt-1">
-                          {job.category}
-                        </Badge>
-                      )}
-                    </div>
+                    {job.category && (
+                      <Badge variant="outline" className="text-xs">
+                        {job.category}
+                      </Badge>
+                    )}
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs text-muted-foreground">Wartość</p>
                     <p className="text-lg font-bold text-foreground">
                       {job.totalCost.toLocaleString('pl-PL')} zł
                     </p>
                   </div>
                 </div>
+
+                {job.status !== 'completed' && job.status !== 'cancelled' && (
+                  <div className="flex gap-2 pt-2">
+                    {job.status === 'pending' && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="flex-1 text-xs"
+                        onClick={() => handleQuickStatusChange(job, 'in-progress')}
+                      >
+                        <Activity className="h-3 w-3 mr-1" />
+                        Rozpocznij
+                      </Button>
+                    )}
+                    {job.status === 'in-progress' && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="flex-1 text-xs"
+                        onClick={() => handleQuickStatusChange(job, 'completed')}
+                      >
+                        <CheckCircle className="h-3 w-3 mr-1" />
+                        Zakończ
+                      </Button>
+                    )}
+                  </div>
+                )}
+
+                {job.notes && (
+                  <div className="pt-2 border-t">
+                    <p className="text-xs text-muted-foreground line-clamp-2">
+                      💡 {job.notes}
+                    </p>
+                  </div>
+                )}
               </CardContent>
             </Card>
           ))}

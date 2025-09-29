@@ -1,5 +1,7 @@
 export type JobStatus = 'pending' | 'in-progress' | 'completed' | 'cancelled';
 
+export type JobPriority = 'low' | 'medium' | 'high' | 'urgent';
+
 export type PhotoType = 'before' | 'progress' | 'after' | 'issue' | 'solution';
 
 export interface Job {
@@ -7,6 +9,7 @@ export interface Job {
   title: string;
   description: string;
   status: JobStatus;
+  priority?: JobPriority;
   clientName: string;
   clientPhone?: string;
   clientEmail?: string;
@@ -19,6 +22,7 @@ export interface Job {
   completedAt?: string;
   category?: string;
   tags?: string[];
+  notes?: string;
 }
 
 export interface TimeEntry {
