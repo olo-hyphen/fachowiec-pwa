@@ -13,6 +13,8 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { ThemeToggle } from '@/components/theme/ThemeToggle';
+import { KeyboardShortcutsInfo } from '@/components/KeyboardShortcutsInfo';
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: Home },
@@ -75,6 +77,8 @@ export default function Navbar() {
             
             <div className="flex items-center space-x-2">
               <NavLinks />
+              <KeyboardShortcutsInfo />
+              <ThemeToggle />
             </div>
           </div>
         </div>
@@ -95,18 +99,21 @@ export default function Navbar() {
             </span>
           </Link>
           
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="sm" className="hover:bg-muted/50 hover:scale-110 transition-all duration-300">
-                <Menu className="h-5 w-5" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-64 glass-card border-none">
-              <div className="flex flex-col gap-3 pt-8">
-                <NavLinks />
-              </div>
-            </SheetContent>
-          </Sheet>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="sm" className="hover:bg-muted/50 hover:scale-110 transition-all duration-300">
+                  <Menu className="h-5 w-5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-64 glass-card border-none">
+                <div className="flex flex-col gap-3 pt-8">
+                  <NavLinks />
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
         </div>
       </div>
     </>

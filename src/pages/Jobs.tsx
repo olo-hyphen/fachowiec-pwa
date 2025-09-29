@@ -298,10 +298,10 @@ export default function Jobs() {
     <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">Zlecenia</h1>
-            <p className="text-muted-foreground">
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">Zlecenia</h1>
+            <p className="text-sm sm:text-base text-muted-foreground">
               Zarządzaj swoimi zleceniami i projektami
             </p>
           </div>
@@ -310,7 +310,7 @@ export default function Jobs() {
             <DialogTrigger asChild>
               <Button 
                 onClick={resetForm}
-                className="bg-gradient-primary hover:bg-gradient-primary/90 shadow-soft"
+                className="bg-gradient-primary hover:bg-gradient-primary/90 shadow-soft w-full sm:w-auto"
               >
                 <Plus className="h-4 w-4 mr-2" />
                 Nowe zlecenie
@@ -505,10 +505,10 @@ export default function Jobs() {
 
         {/* Filters */}
         <Card className="mb-6 shadow-soft">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex flex-col gap-4">
-              <div className="flex flex-col md:flex-row gap-4">
-                <div className="flex-1">
+              <div className="flex flex-col gap-3">
+                <div className="w-full">
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
@@ -519,9 +519,9 @@ export default function Jobs() {
                     />
                   </div>
                 </div>
-                <div className="flex gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                   <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger className="w-[160px]">
+                    <SelectTrigger className="w-full">
                       <SelectValue placeholder="Status" />
                     </SelectTrigger>
                     <SelectContent>
@@ -533,7 +533,7 @@ export default function Jobs() {
                     </SelectContent>
                   </Select>
                   <Select value={priorityFilter} onValueChange={setPriorityFilter}>
-                    <SelectTrigger className="w-[160px]">
+                    <SelectTrigger className="w-full">
                       <SelectValue placeholder="Priorytet" />
                     </SelectTrigger>
                     <SelectContent>
@@ -545,7 +545,7 @@ export default function Jobs() {
                     </SelectContent>
                   </Select>
                   <Select value={sortBy} onValueChange={setSortBy}>
-                    <SelectTrigger className="w-[180px]">
+                    <SelectTrigger className="w-full">
                       <ArrowUpDown className="h-4 w-4 mr-2" />
                       <SelectValue placeholder="Sortuj" />
                     </SelectTrigger>
@@ -584,18 +584,18 @@ export default function Jobs() {
         </Card>
 
         {/* Jobs List */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {filteredJobs.map((job) => (
             <Card key={job.id} className="shadow-soft hover:shadow-medium transition-all hover-scale">
-              <CardHeader className="pb-3">
+              <CardHeader className="pb-3 p-4 sm:p-6">
                 <div className="flex justify-between items-start gap-2">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2">
                       {getPriorityIcon(job.priority)}
-                      <CardTitle className="text-lg truncate">{job.title}</CardTitle>
+                      <CardTitle className="text-base sm:text-lg truncate">{job.title}</CardTitle>
                     </div>
                     <div className="flex items-center gap-2 flex-wrap">
-                      <Badge variant={getStatusBadgeVariant(job.status)} className="flex items-center gap-1">
+                      <Badge variant={getStatusBadgeVariant(job.status)} className="flex items-center gap-1 text-xs">
                         {getStatusIcon(job.status)}
                         {getStatusText(job.status)}
                       </Badge>
@@ -606,25 +606,27 @@ export default function Jobs() {
                       )}
                     </div>
                   </div>
-                  <div className="flex gap-1">
+                  <div className="flex gap-1 flex-shrink-0">
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => handleEdit(job)}
+                      className="h-8 w-8 p-0"
                     >
-                      <Edit className="h-4 w-4" />
+                      <Edit className="h-3.5 w-3.5" />
                     </Button>
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => handleDelete(job)}
+                      className="h-8 w-8 p-0"
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash2 className="h-3.5 w-3.5" />
                     </Button>
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="space-y-3 p-4 sm:p-6 pt-0 sm:pt-0">
                 <div>
                   <p className="text-sm text-foreground font-medium">{job.clientName}</p>
                   <p className="text-sm text-muted-foreground">{job.address}</p>

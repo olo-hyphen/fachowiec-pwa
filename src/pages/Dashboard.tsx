@@ -101,7 +101,7 @@ export default function Dashboard() {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 animate-fade-in">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6 animate-fade-in">
         <div className="animate-bounce-in" style={{animationDelay: '0.1s'}}>
           <StatCard
             title="Zakończone zlecenia"
@@ -164,27 +164,27 @@ export default function Dashboard() {
             {recentJobs.map((job, index) => (
               <div
                 key={job.id}
-                className="flex items-center justify-between p-4 glass rounded-xl hover:shadow-glass transition-all duration-300 hover:scale-[1.02] group"
+                className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 sm:p-4 glass rounded-xl hover:shadow-glass transition-all duration-300 hover:scale-[1.02] group gap-3 sm:gap-4"
                 style={{animationDelay: `${0.7 + index * 0.1}s`}}
               >
-                <div className="flex items-center gap-4">
-                  <div className="group-hover:scale-110 transition-transform duration-300">
+                <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto">
+                  <div className="group-hover:scale-110 transition-transform duration-300 flex-shrink-0">
                     {getStatusIcon(job.status)}
                   </div>
-                  <div>
-                    <h3 className="font-medium text-foreground font-inter group-hover:text-primary transition-colors">
+                  <div className="min-w-0 flex-1">
+                    <h3 className="font-medium text-foreground font-inter group-hover:text-primary transition-colors truncate">
                       {job.title}
                     </h3>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-xs sm:text-sm text-muted-foreground truncate">
                       {job.clientName} • {job.address}
                     </p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <p className="font-semibold text-foreground font-poppins">
+                <div className="text-left sm:text-right w-full sm:w-auto flex-shrink-0">
+                  <p className="font-semibold text-foreground font-poppins text-sm sm:text-base">
                     {job.totalCost.toLocaleString('pl-PL')} zł
                   </p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-xs sm:text-sm text-muted-foreground">
                     {getStatusText(job.status)}
                   </p>
                 </div>

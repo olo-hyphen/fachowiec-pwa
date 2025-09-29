@@ -2,6 +2,7 @@ import { NavLink } from "react-router-dom";
 import { Home, Briefcase, Users, FileText, Calendar, Plus, Clock } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: Home },
@@ -27,17 +28,20 @@ export default function MobileNavigation() {
                 key={item.name}
                 to={item.href}
                 className={({ isActive }) =>
-                  `flex flex-col items-center space-y-1 px-3 py-2 rounded-2xl transition-all duration-300 ${
+                  `flex flex-col items-center space-y-1 px-2 py-2 rounded-2xl transition-all duration-300 ${
                     isActive
                       ? "bg-primary text-primary-foreground shadow-glow transform scale-105"
                       : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                   }`
                 }
               >
-                <item.icon className="h-5 w-5" />
-                <span className="text-xs font-medium">{item.name}</span>
+                <item.icon className="h-4 w-4" />
+                <span className="text-[10px] font-medium">{item.name}</span>
               </NavLink>
             ))}
+            <div className="flex flex-col items-center space-y-1 px-2 py-2">
+              <ThemeToggle />
+            </div>
           </nav>
         </div>
       </div>
