@@ -60,9 +60,9 @@ export default function Jobs() {
     filterJobs();
   }, [jobs, searchTerm, statusFilter, priorityFilter, sortBy]);
 
-  const loadJobs = () => {
-    const allJobs = getJobs();
-    setJobs(allJobs);
+  const loadJobs = async () => {
+    const allJobs = await getJobs();
+    setJobs(allJobs as any);
   };
 
   const filterJobs = () => {

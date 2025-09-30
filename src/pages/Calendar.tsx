@@ -25,12 +25,16 @@ export default function Calendar() {
   }, [currentDate]);
 
   const fetchJobs = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
     const start = startOfMonth(currentDate);
     const end = endOfMonth(currentDate);
 
     const { data, error } = await supabase
       .from("jobs")
       .select("*")
+      .eq('user_id', user.id)
       .gte("scheduled_date", format(start, "yyyy-MM-dd"))
       .lte("scheduled_date", format(end, "yyyy-MM-dd"))
       .order("scheduled_date");

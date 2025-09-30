@@ -27,36 +27,37 @@ export default function Dashboard() {
   const [recentJobs, setRecentJobs] = useState<Job[]>([]);
 
   useEffect(() => {
-    // Initialize sample data on first load
-    initializeSampleData();
-    
     // Calculate KPIs
-    const jobs = getJobs();
-    const timeEntries = getTimeEntries();
-    
-    const completedJobs = jobs.filter(job => job.status === 'completed');
-    const activeJobs = jobs.filter(job => job.status === 'in-progress');
-    const totalRevenue = completedJobs.reduce((sum, job) => sum + job.totalCost, 0);
-    
-    // Calculate average job duration from time entries
-    const avgDuration = timeEntries.length > 0 
-      ? timeEntries.reduce((sum, entry) => sum + entry.duration, 0) / timeEntries.length / 60 // convert to hours
-      : 0;
+    const fetchData = async () => {
+      const jobs = await getJobs();
+      const timeEntries = await getTimeEntries();
+      
+      const completedJobs = jobs.filter(job => job.status === 'completed');
+      const activeJobs = jobs.filter(job => job.status === 'in-progress');
+      const totalRevenue = completedJobs.reduce((sum, job) => sum + (job.actual_cost || 0), 0);
+      
+      // Calculate average job duration from time entries
+      const avgDuration = timeEntries.length > 0 
+        ? timeEntries.reduce((sum, entry) => sum + (entry.duration || 0), 0) / timeEntries.length / 60 // convert to hours
+        : 0;
 
-    setKpi({
-      completedJobs: completedJobs.length,
-      totalRevenue,
-      averageJobDuration: Math.round(avgDuration * 10) / 10,
-      averageRating: 4.8,
-      activeJobs: activeJobs.length,
-      profitMargin: 85
-    });
+      setKpi({
+        completedJobs: completedJobs.length,
+        totalRevenue,
+        averageJobDuration: Math.round(avgDuration * 10) / 10,
+        averageRating: 4.8,
+        activeJobs: activeJobs.length,
+        profitMargin: 85
+      });
 
-    // Set recent jobs (last 5)
-    const sortedJobs = jobs
-      .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
-      .slice(0, 5);
-    setRecentJobs(sortedJobs);
+      // Set recent jobs (last 5)
+      const sortedJobs = jobs
+        .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
+        .slice(0, 5);
+      setRecentJobs(sortedJobs as any);
+    };
+    
+    fetchData();
   }, []);
 
   const getStatusIcon = (status: string) => {

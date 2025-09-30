@@ -9,12 +9,14 @@ import {
   FileText,
   Calendar as CalendarIcon,
   BarChart3,
-  Menu
+  Menu,
+  LogOut
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { KeyboardShortcutsInfo } from '@/components/KeyboardShortcutsInfo';
+import { useAuth } from '@/contexts/AuthContext';
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: Home },
@@ -29,6 +31,7 @@ const navigation = [
 
 export default function Navbar() {
   const location = useLocation();
+  const { signOut } = useAuth();
 
   const NavLinks = () => (
     <>
@@ -79,6 +82,15 @@ export default function Navbar() {
               <NavLinks />
               <KeyboardShortcutsInfo />
               <ThemeToggle />
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={signOut}
+                className="flex items-center gap-2 hover:bg-destructive/10 hover:text-destructive"
+              >
+                <LogOut className="h-4 w-4" />
+                Wyloguj
+              </Button>
             </div>
           </div>
         </div>
@@ -110,6 +122,14 @@ export default function Navbar() {
               <SheetContent side="right" className="w-64 glass-card border-none">
                 <div className="flex flex-col gap-3 pt-8">
                   <NavLinks />
+                  <Button 
+                    variant="ghost" 
+                    onClick={signOut}
+                    className="flex items-center gap-2 hover:bg-destructive/10 hover:text-destructive justify-start"
+                  >
+                    <LogOut className="h-5 w-5" />
+                    Wyloguj
+                  </Button>
                 </div>
               </SheetContent>
             </Sheet>

@@ -25,6 +25,7 @@ export type Database = {
           phone: string | null
           rating: number | null
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           address?: string | null
@@ -36,6 +37,7 @@ export type Database = {
           phone?: string | null
           rating?: number | null
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           address?: string | null
@@ -47,6 +49,7 @@ export type Database = {
           phone?: string | null
           rating?: number | null
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -64,6 +67,7 @@ export type Database = {
           title: string
           total_amount: number
           updated_at: string
+          user_id: string | null
           valid_until: string | null
         }
         Insert: {
@@ -79,6 +83,7 @@ export type Database = {
           title: string
           total_amount?: number
           updated_at?: string
+          user_id?: string | null
           valid_until?: string | null
         }
         Update: {
@@ -94,6 +99,7 @@ export type Database = {
           title?: string
           total_amount?: number
           updated_at?: string
+          user_id?: string | null
           valid_until?: string | null
         }
         Relationships: [
@@ -124,6 +130,7 @@ export type Database = {
           title: string
           total_cost: number | null
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           actual_cost?: number | null
@@ -142,6 +149,7 @@ export type Database = {
           title: string
           total_cost?: number | null
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           actual_cost?: number | null
@@ -160,6 +168,7 @@ export type Database = {
           title?: string
           total_cost?: number | null
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -186,6 +195,7 @@ export type Database = {
           job_id: string | null
           type: string
           url: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string
@@ -194,6 +204,7 @@ export type Database = {
           job_id?: string | null
           type: string
           url: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string
@@ -202,6 +213,7 @@ export type Database = {
           job_id?: string | null
           type?: string
           url?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -213,6 +225,30 @@ export type Database = {
           },
         ]
       }
+      profiles: {
+        Row: {
+          created_at: string | null
+          email: string | null
+          full_name: string | null
+          id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email?: string | null
+          full_name?: string | null
+          id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       time_entries: {
         Row: {
           created_at: string
@@ -222,6 +258,7 @@ export type Database = {
           id: string
           job_id: string | null
           start_time: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string
@@ -231,6 +268,7 @@ export type Database = {
           id?: string
           job_id?: string | null
           start_time: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string
@@ -240,6 +278,7 @@ export type Database = {
           id?: string
           job_id?: string | null
           start_time?: string
+          user_id?: string | null
         }
         Relationships: [
           {

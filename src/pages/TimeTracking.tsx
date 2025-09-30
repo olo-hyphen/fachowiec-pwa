@@ -51,9 +51,11 @@ export default function TimeTracking() {
     };
   }, [activeTimer]);
 
-  const loadData = () => {
-    setJobs(getJobs());
-    setTimeEntries(getTimeEntries());
+  const loadData = async () => {
+    const fetchedJobs = await getJobs();
+    setJobs(fetchedJobs as any);
+    const fetchedTimeEntries = await getTimeEntries();
+    setTimeEntries(fetchedTimeEntries as any);
   };
 
   const formatTime = (seconds: number): string => {

@@ -58,9 +58,13 @@ export default function Estimates() {
   }, []);
 
   const fetchEstimates = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
     const { data, error } = await supabase
       .from("cost_estimates")
       .select("*")
+      .eq('user_id', user.id)
       .order("created_at", { ascending: false });
 
     if (error) {
@@ -74,7 +78,13 @@ export default function Estimates() {
   };
 
   const fetchClients = async () => {
-    const { data, error } = await supabase.from("clients").select("id, name");
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { data, error } = await supabase
+      .from("clients")
+      .select("id, name")
+      .eq('user_id', user.id);
     if (!error) setClients(data || []);
   };
 
@@ -101,7 +111,8 @@ export default function Estimates() {
       tax_amount,
       total_amount,
       valid_until: formData.valid_until || null,
-      status: "draft"
+      status: "draft",
+      user_id: (await supabase.auth.getUser()).data.user?.id
     };
 
     const { error } = await supabase.from("cost_estimates").insert([estimateData]);
@@ -116,10 +127,14 @@ export default function Estimates() {
   };
 
   const updateStatus = async (id: string, status: string) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
     const { error } = await supabase
       .from("cost_estimates")
       .update({ status })
-      .eq("id", id);
+      .eq("id", id)
+      .eq('user_id', user.id);
 
     if (error) {
       toast({ title: "Error", description: "Failed to update status", variant: "destructive" });

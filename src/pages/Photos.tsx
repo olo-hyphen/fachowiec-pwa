@@ -48,9 +48,11 @@ export default function Photos() {
     filterPhotos();
   }, [photos, searchTerm, jobFilter, typeFilter]);
 
-  const loadData = () => {
-    setJobs(getJobs());
-    setPhotos(getPhotos());
+  const loadData = async () => {
+    const fetchedJobs = await getJobs();
+    setJobs(fetchedJobs as any);
+    const fetchedPhotos = await getPhotos();
+    setPhotos(fetchedPhotos as any);
   };
 
   const filterPhotos = () => {

@@ -38,9 +38,13 @@ export default function Clients() {
   }, []);
 
   const fetchClients = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
     const { data, error } = await supabase
       .from("clients")
       .select("*")
+      .eq('user_id', user.id)
       .order("created_at", { ascending: false });
 
     if (error) {
@@ -58,10 +62,14 @@ export default function Clients() {
     e.preventDefault();
 
     if (editingClient) {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
       const { error } = await supabase
         .from("clients")
         .update(formData)
-        .eq("id", editingClient.id);
+        .eq("id", editingClient.id)
+        .eq('user_id', user.id);
 
       if (error) {
         toast({
@@ -75,7 +83,10 @@ export default function Clients() {
         closeDialog();
       }
     } else {
-      const { error } = await supabase.from("clients").insert([formData]);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { error } = await supabase.from("clients").insert([{ ...formData, user_id: user.id }]);
 
       if (error) {
         toast({
@@ -94,7 +105,10 @@ export default function Clients() {
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this client?")) return;
 
-    const { error } = await supabase.from("clients").delete().eq("id", id);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { error} = await supabase.from("clients").delete().eq("id", id).eq('user_id', user.id);
 
     if (error) {
       toast({
