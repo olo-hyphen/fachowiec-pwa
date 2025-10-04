@@ -128,7 +128,10 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground font-inter antialiased;
+    font-size: 16px; /* Minimum for mobile accessibility */
     transition: background-color 0.3s ease, color 0.3s ease;
+    /* Safe area insets for iOS notch/home indicator */
+    padding-bottom: env(safe-area-inset-bottom);
   }
   
   body:not(.dark) {
@@ -141,6 +144,8 @@ All colors MUST be HSL.
 
   html {
     scroll-behavior: smooth;
+    /* Prevent pull-to-refresh bounce on mobile */
+    overscroll-behavior-y: contain;
   }
 }
 
@@ -213,6 +218,45 @@ All colors MUST be HSL.
     100% {
       transform: scale(1);
       opacity: 1;
+    }
+  }
+
+  /* Mobile-specific optimizations */
+  @media (max-width: 768px) {
+    /* Increase touch targets */
+    button, a[role="button"], [role="button"] {
+      min-height: 44px;
+    }
+
+    /* Better input styling for mobile */
+    input, select, textarea {
+      font-size: 16px !important; /* Prevents zoom on iOS */
+      -webkit-appearance: none;
+    }
+
+    /* Improve tap highlight */
+    * {
+      -webkit-tap-highlight-color: hsl(var(--primary) / 0.1);
+    }
+
+    /* Better card spacing on mobile */
+    .grid {
+      gap: 0.75rem;
+    }
+
+    /* Reduce padding on smaller screens */
+    .container {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+  }
+
+  /* Optimize animations for reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
     }
   }
 }

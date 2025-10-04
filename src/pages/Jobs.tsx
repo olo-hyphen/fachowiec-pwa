@@ -295,13 +295,13 @@ export default function Jobs() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="min-h-screen bg-background pb-safe">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">Zlecenia</h1>
-            <p className="text-sm sm:text-base text-muted-foreground">
+            <p className="text-base text-muted-foreground">
               Zarządzaj swoimi zleceniami i projektami
             </p>
           </div>
@@ -316,9 +316,9 @@ export default function Jobs() {
                 Nowe zlecenie
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>
+            <DialogContent className="max-w-2xl max-h-[90vh] md:max-h-[85vh] overflow-y-auto">
+              <DialogHeader className="sticky top-0 bg-background z-10 pb-4">
+                <DialogTitle className="text-lg md:text-xl">
                   {editingJob ? 'Edytuj zlecenie' : 'Nowe zlecenie'}
                 </DialogTitle>
               </DialogHeader>
@@ -486,15 +486,16 @@ export default function Jobs() {
                   </div>
                 )}
 
-                <div className="flex justify-end gap-2">
+                <div className="flex justify-end gap-2 sticky bottom-0 bg-background pt-4 pb-2">
                   <Button 
                     type="button" 
                     variant="outline" 
                     onClick={() => setIsDialogOpen(false)}
+                    className="flex-1 sm:flex-none"
                   >
                     Anuluj
                   </Button>
-                  <Button type="submit">
+                  <Button type="submit" className="flex-1 sm:flex-none">
                     {editingJob ? 'Zaktualizuj' : 'Utwórz'} zlecenie
                   </Button>
                 </div>

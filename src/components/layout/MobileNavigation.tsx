@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { Home, Briefcase, Users, FileText, Calendar, Plus, Clock } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -14,8 +14,14 @@ const navigation = [
 
 export default function MobileNavigation() {
   const [showFAB, setShowFAB] = useState(false);
+  const navigate = useNavigate();
 
   const toggleFAB = () => setShowFAB(!showFAB);
+
+  const handleNavigate = (path: string) => {
+    navigate(path);
+    setShowFAB(false);
+  };
 
   return (
     <>
@@ -28,15 +34,15 @@ export default function MobileNavigation() {
                 key={item.name}
                 to={item.href}
                 className={({ isActive }) =>
-                  `flex flex-col items-center space-y-1 px-2 py-2 rounded-2xl transition-all duration-300 ${
+                  `flex flex-col items-center space-y-1 px-3 py-2.5 rounded-2xl transition-all duration-300 min-w-[44px] min-h-[44px] ${
                     isActive
                       ? "bg-primary text-primary-foreground shadow-glow transform scale-105"
                       : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                   }`
                 }
               >
-                <item.icon className="h-4 w-4" />
-                <span className="text-[10px] font-medium">{item.name}</span>
+                <item.icon className="h-5 w-5" />
+                <span className="text-[11px] font-medium">{item.name}</span>
               </NavLink>
             ))}
             <div className="flex flex-col items-center space-y-1 px-2 py-2">
@@ -50,21 +56,33 @@ export default function MobileNavigation() {
       <div className="fixed bottom-24 right-6 z-40 md:hidden">
         <div className="relative">
           {showFAB && (
-            <div className="absolute bottom-16 right-0 space-y-3 animate-slide-up">
-              <Button
-                size="lg"
-                className="w-14 h-14 rounded-full glass-card shadow-glass hover:shadow-glow transition-all duration-300 hover:scale-110"
-                onClick={() => window.location.href = "/jobs"}
-              >
-                <Briefcase className="h-6 w-6" />
-              </Button>
-              <Button
-                size="lg"
-                className="w-14 h-14 rounded-full glass-card shadow-glass hover:shadow-glow transition-all duration-300 hover:scale-110"
-                onClick={() => window.location.href = "/time-tracking"}
-              >
-                <Clock className="h-6 w-6" />
-              </Button>
+            <div className="absolute bottom-20 right-0 space-y-3 animate-slide-up">
+              <div className="relative group">
+                <Button
+                  size="lg"
+                  className="w-14 h-14 rounded-full glass-card shadow-glass hover:shadow-glow transition-all duration-300 hover:scale-110"
+                  onClick={() => handleNavigate("/jobs")}
+                  aria-label="Nowe zlecenie"
+                >
+                  <Briefcase className="h-6 w-6" />
+                </Button>
+                <span className="absolute right-16 top-1/2 -translate-y-1/2 bg-foreground text-background text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                  Zlecenie
+                </span>
+              </div>
+              <div className="relative group">
+                <Button
+                  size="lg"
+                  className="w-14 h-14 rounded-full glass-card shadow-glass hover:shadow-glow transition-all duration-300 hover:scale-110"
+                  onClick={() => handleNavigate("/time-tracking")}
+                  aria-label="Czas pracy"
+                >
+                  <Clock className="h-6 w-6" />
+                </Button>
+                <span className="absolute right-16 top-1/2 -translate-y-1/2 bg-foreground text-background text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                  Czas pracy
+                </span>
+              </div>
             </div>
           )}
           
