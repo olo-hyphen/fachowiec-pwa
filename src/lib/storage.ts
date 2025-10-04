@@ -23,16 +23,32 @@ export async function saveJob(job: any) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('User not authenticated');
 
-  const jobData = {
-    ...job,
+  // Map frontend fields (camelCase) to backend schema (snake_case) and discard unknown columns
+  const now = new Date().toISOString();
+  const mappedData: any = {
+    title: job.title,
+    description: job.description ?? null,
+    status: job.status ?? 'pending',
+    priority: job.priority ?? 'medium',
+    estimated_hours: job.estimatedHours ?? null,
+    hourly_rate: job.hourlyRate ?? null,
+    total_cost: job.totalCost ?? null,
+    notes: job.notes ?? null,
     user_id: user.id,
-    updated_at: new Date().toISOString()
+    updated_at: now,
   };
 
-  if (job.id) {
+  if (job.completedAt) mappedData.completed_at = job.completedAt;
+
+  // Update only if id is a valid UUID; otherwise insert a new row
+  const isUuid = (val: string) =>
+    typeof val === 'string' &&
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(val);
+
+  if (isUuid(job.id)) {
     const { error } = await supabase
       .from('jobs')
-      .update(jobData)
+      .update(mappedData)
       .eq('id', job.id)
       .eq('user_id', user.id);
 
@@ -40,7 +56,7 @@ export async function saveJob(job: any) {
   } else {
     const { error } = await supabase
       .from('jobs')
-      .insert([jobData]);
+      .insert([mappedData]);
 
     if (error) throw error;
   }
