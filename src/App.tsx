@@ -7,6 +7,8 @@ import { ThemeProvider } from "./components/theme/ThemeProvider";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
+import { PWAInstallPrompt } from "./components/PWAInstallPrompt";
+import { PWAUpdatePrompt } from "./components/PWAUpdatePrompt";
 import Dashboard from "./pages/Dashboard";
 import Jobs from "./pages/Jobs";
 import TimeTracking from "./pages/TimeTracking";
@@ -61,6 +63,8 @@ const App = () => (
         <BrowserRouter>
           <AuthProvider>
             <AppContent />
+            <PWAInstallPrompt />
+            <PWAUpdatePrompt />
           </AuthProvider>
         </BrowserRouter>
       </TooltipProvider>

@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { KeyboardShortcutsInfo } from '@/components/KeyboardShortcutsInfo';
+import { PWAStatus } from '@/components/PWAStatus';
 import { useAuth } from '@/contexts/AuthContext';
 
 const navigation = [
@@ -80,11 +81,12 @@ export default function Navbar() {
             
             <div className="flex items-center space-x-2">
               <NavLinks />
+              <PWAStatus />
               <KeyboardShortcutsInfo />
               <ThemeToggle />
-              <Button 
-                variant="ghost" 
-                size="sm" 
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={signOut}
                 className="flex items-center gap-2 hover:bg-destructive/10 hover:text-destructive"
               >
