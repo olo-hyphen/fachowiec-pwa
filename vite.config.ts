@@ -5,6 +5,8 @@ import { componentTagger } from "lovable-tagger";
 import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig(({ mode }) => ({
+  // Base URL dla GitHub Pages - zmień na '/' dla innych hostingów
+  base: process.env.GITHUB_PAGES === 'true' ? '/fachowiec-pwa/' : '/',
   server: {
     host: "::",
     port: 8080,
@@ -23,29 +25,29 @@ export default defineConfig(({ mode }) => ({
         background_color: "#ffffff",
         display: "standalone",
         orientation: "portrait",
-        scope: "/",
-        start_url: "/",
+        scope: process.env.GITHUB_PAGES === 'true' ? '/fachowiec-pwa/' : '/',
+        start_url: process.env.GITHUB_PAGES === 'true' ? '/fachowiec-pwa/' : '/',
         icons: [
           {
-            src: "/pwa-192x192.png",
+            src: process.env.GITHUB_PAGES === 'true' ? "/fachowiec-pwa/pwa-192x192.png" : "/pwa-192x192.png",
             sizes: "192x192",
             type: "image/png",
             purpose: "any"
           },
           {
-            src: "/pwa-512x512.png",
+            src: process.env.GITHUB_PAGES === 'true' ? "/fachowiec-pwa/pwa-512x512.png" : "/pwa-512x512.png",
             sizes: "512x512",
             type: "image/png",
             purpose: "any"
           },
           {
-            src: "/pwa-maskable-192x192.png",
+            src: process.env.GITHUB_PAGES === 'true' ? "/fachowiec-pwa/pwa-maskable-192x192.png" : "/pwa-maskable-192x192.png",
             sizes: "192x192",
             type: "image/png",
             purpose: "maskable"
           },
           {
-            src: "/pwa-maskable-512x512.png",
+            src: process.env.GITHUB_PAGES === 'true' ? "/fachowiec-pwa/pwa-maskable-512x512.png" : "/pwa-maskable-512x512.png",
             sizes: "512x512",
             type: "image/png",
             purpose: "maskable"
@@ -57,42 +59,37 @@ export default defineConfig(({ mode }) => ({
             name: "Nowe zlecenie",
             short_name: "Zlecenie",
             description: "Utwórz nowe zlecenie",
-            url: "/jobs",
-            icons: [{ src: "/pwa-192x192.png", sizes: "192x192" }]
+            url: process.env.GITHUB_PAGES === 'true' ? "/fachowiec-pwa/jobs" : "/jobs",
+            icons: [{ 
+              src: process.env.GITHUB_PAGES === 'true' ? "/fachowiec-pwa/pwa-192x192.png" : "/pwa-192x192.png", 
+              sizes: "192x192" 
+            }]
           },
           {
             name: "Timer",
             short_name: "Timer",
             description: "Start time tracking",
-            url: "/time-tracking",
-            icons: [{ src: "/pwa-192x192.png", sizes: "192x192" }]
+            url: process.env.GITHUB_PAGES === 'true' ? "/fachowiec-pwa/time-tracking" : "/time-tracking",
+            icons: [{ 
+              src: process.env.GITHUB_PAGES === 'true' ? "/fachowiec-pwa/pwa-192x192.png" : "/pwa-192x192.png", 
+              sizes: "192x192" 
+            }]
           },
           {
             name: "Dashboard",
             short_name: "Dashboard",
             description: "Zobacz podsumowanie",
-            url: "/",
-            icons: [{ src: "/pwa-192x192.png", sizes: "192x192" }]
+            url: process.env.GITHUB_PAGES === 'true' ? "/fachowiec-pwa/" : "/",
+            icons: [{ 
+              src: process.env.GITHUB_PAGES === 'true' ? "/fachowiec-pwa/pwa-192x192.png" : "/pwa-192x192.png", 
+              sizes: "192x192" 
+            }]
           }
         ]
       },
       workbox: {
         globPatterns: ["**/*.{js,css,html,ico,png,svg,woff,woff2}"],
         runtimeCaching: [
-          {
-            urlPattern: /^https:\/\/.*\.supabase\.co\/.*/i,
-            handler: "NetworkFirst",
-            options: {
-              cacheName: "supabase-cache",
-              expiration: {
-                maxEntries: 50,
-                maxAgeSeconds: 60 * 60 * 24 * 7
-              },
-              cacheableResponse: {
-                statuses: [0, 200]
-              }
-            }
-          },
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
             handler: "CacheFirst",
