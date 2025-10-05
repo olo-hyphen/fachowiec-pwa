@@ -1,12 +1,11 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { User, Session } from '@supabase/supabase-js';
-import { supabase } from '@/lib/supabaseClient';
+import * as auth from '@/lib/auth';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
 
 interface AuthContextType {
-  user: User | null;
-  session: Session | null;
+  user: auth.User | null;
+  session: auth.Session | null;
   signUp: (email: string, password: string, fullName?: string) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
@@ -16,44 +15,22 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
+  const [user, setUser] = useState<auth.User | null>(null);
+  const [session, setSession] = useState<auth.Session | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Set up auth state listener FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
-      }
-    );
-
-    // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
+    const currentSession = auth.getSession();
+    if (currentSession) {
+      setSession(currentSession);
+      setUser(currentSession.user);
+    }
+    setLoading(false);
   }, []);
 
-  const signUp = async (email: string, password: string, fullName?: string) => {
-    const redirectUrl = `${window.location.origin}/`;
-    
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: redirectUrl,
-        data: {
-          full_name: fullName || ''
-        }
-      }
-    });
+  const handleSignUp = async (email: string, password: string, fullName?: string) => {
+    const { error } = await auth.signUp(email, password, fullName);
 
     if (error) {
       toast({
@@ -71,11 +48,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error };
   };
 
-  const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password
-    });
+  const handleSignIn = async (email: string, password: string) => {
+    const { session: newSession, error } = await auth.signIn(email, password);
 
     if (error) {
       toast({
@@ -83,15 +57,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         description: error.message,
         variant: "destructive"
       });
-    } else {
+    } else if (newSession) {
+      setSession(newSession);
+      setUser(newSession.user);
       navigate('/');
     }
 
     return { error };
   };
 
-  const signOut = async () => {
-    await supabase.auth.signOut();
+  const handleSignOut = async () => {
+    await auth.signOut();
+    setSession(null);
+    setUser(null);
     navigate('/auth');
     toast({
       title: "Wylogowano",
@@ -100,7 +78,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, signUp, signIn, signOut, loading }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      session, 
+      signUp: handleSignUp, 
+      signIn: handleSignIn, 
+      signOut: handleSignOut, 
+      loading 
+    }}>
       {children}
     </AuthContext.Provider>
   );

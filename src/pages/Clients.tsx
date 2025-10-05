@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabaseClient";
+import { getClients, saveClient, deleteClient } from "@/lib/storage";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -38,87 +38,53 @@ export default function Clients() {
   }, []);
 
   const fetchClients = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-
-    const { data, error } = await supabase
-      .from("clients")
-      .select("*")
-      .eq('user_id', user.id)
-      .order("created_at", { ascending: false });
-
-    if (error) {
+    try {
+      const data = await getClients();
+      setClients(data);
+    } catch (error) {
       toast({
         title: "Error",
         description: "Failed to load clients",
         variant: "destructive"
       });
-    } else {
-      setClients(data || []);
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (editingClient) {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const { error } = await supabase
-        .from("clients")
-        .update(formData)
-        .eq("id", editingClient.id)
-        .eq('user_id', user.id);
-
-      if (error) {
-        toast({
-          title: "Error",
-          description: "Failed to update client",
-          variant: "destructive"
-        });
-      } else {
+    try {
+      if (editingClient) {
+        await saveClient({ ...formData, id: editingClient.id });
         toast({ title: "Success", description: "Client updated successfully" });
-        fetchClients();
-        closeDialog();
-      }
-    } else {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const { error } = await supabase.from("clients").insert([{ ...formData, user_id: user.id }]);
-
-      if (error) {
-        toast({
-          title: "Error",
-          description: "Failed to create client",
-          variant: "destructive"
-        });
       } else {
+        await saveClient(formData);
         toast({ title: "Success", description: "Client created successfully" });
-        fetchClients();
-        closeDialog();
       }
+      fetchClients();
+      closeDialog();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: editingClient ? "Failed to update client" : "Failed to create client",
+        variant: "destructive"
+      });
     }
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this client?")) return;
 
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-
-    const { error} = await supabase.from("clients").delete().eq("id", id).eq('user_id', user.id);
-
-    if (error) {
+    try {
+      await deleteClient(id);
+      toast({ title: "Success", description: "Client deleted successfully" });
+      fetchClients();
+    } catch (error) {
       toast({
         title: "Error",
         description: "Failed to delete client",
         variant: "destructive"
       });
-    } else {
-      toast({ title: "Success", description: "Client deleted successfully" });
-      fetchClients();
     }
   };
 
