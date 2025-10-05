@@ -14,6 +14,7 @@ import Photos from "./pages/Photos";
 import Clients from "./pages/Clients";
 import Estimates from "./pages/Estimates";
 import Calendar from "./pages/Calendar";
+import Reports from "./pages/Reports";
 import Navbar from "./components/layout/Navbar";
 import MobileNavigation from "./components/layout/MobileNavigation";
 import NotFound from "./pages/NotFound";
@@ -35,7 +36,7 @@ function AppContent() {
           <Route path="/clients" element={<Clients />} />
           <Route path="/estimates" element={<Estimates />} />
           <Route path="/calendar" element={<Calendar />} />
-          <Route path="/reports" element={<div className="p-4 md:p-8"><h1 className="text-2xl font-poppins">Raporty - W przygotowaniu</h1></div>} />
+          <Route path="/reports" element={<Reports />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>

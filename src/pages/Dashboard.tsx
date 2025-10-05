@@ -27,6 +27,9 @@ export default function Dashboard() {
   const [recentJobs, setRecentJobs] = useState<Job[]>([]);
 
   useEffect(() => {
+    // Initialize sample data if needed
+    initializeSampleData();
+    
     // Calculate KPIs
     const fetchData = async () => {
       const jobs = await getJobs();
@@ -52,7 +55,7 @@ export default function Dashboard() {
 
       // Set recent jobs (last 5)
       const sortedJobs = jobs
-        .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
+        .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
         .slice(0, 5);
       setRecentJobs(sortedJobs as any);
     };

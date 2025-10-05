@@ -17,9 +17,11 @@ export interface Job {
   estimatedHours: number;
   hourlyRate: number;
   totalCost: number;
+  actual_cost?: number;
   createdAt: string;
   updatedAt: string;
   completedAt?: string;
+  scheduled_date?: string;
   category?: string;
   tags?: string[];
   notes?: string;
