@@ -1,73 +1,227 @@
-# Welcome to your Lovable project
+# 🛠️ Fachowiec PWA - Aplikacja do zarządzania zleceniami
 
-## Project info
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)]()
+[![PWA](https://img.shields.io/badge/PWA-enabled-blue)]()
+[![License](https://img.shields.io/badge/license-MIT-green)]()
 
-**URL**: https://lovable.dev/projects/bc0b1eab-7968-470f-9603-e88f62408dc1
+**Kompleksowa aplikacja Progressive Web App dla fachowców** - zarządzaj zleceniami, klientami, czasem pracy i kosztorysami w jednym miejscu. Działa offline z wykorzystaniem localStorage!
 
-## How can I edit this code?
+## ✨ Funkcje
 
-There are several ways of editing your application.
+- 📱 **Progressive Web App** - instalowalna na telefonie i komputerze
+- 🔒 **System autentykacji** - bezpieczne logowanie z localStorage
+- 📊 **Dashboard** - przegląd statystyk i aktywnych zleceń
+- 👥 **Zarządzanie klientami** - baza kontaktów z oceną i notatkami
+- 📋 **Zlecenia** - pełne zarządzanie zleceniami z priorytetami i statusami
+- 💰 **Kosztorysy** - tworzenie profesjonalnych kosztorysów z VAT
+- 📅 **Kalendarz** - wizualizacja zleceń w kalendarzu miesięcznym
+- ⏱️ **Czas pracy** - śledzenie czasu pracy przy zleceniach
+- 📸 **Zdjęcia** - dokumentacja zleceń (przed/po)
+- 🌙 **Tryb ciemny** - automatyczne przełączanie motywu
+- 📱 **Responsywny design** - działa na wszystkich urządzeniach
+- 🔄 **Offline-first** - pełna funkcjonalność bez internetu
 
-**Use Lovable**
+## 🚀 Szybki start
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/bc0b1eab-7968-470f-9603-e88f62408dc1) and start prompting.
+### Wymagania
 
-Changes made via Lovable will be committed automatically to this repo.
+- Node.js 18+ 
+- npm lub bun
 
-**Use your preferred IDE**
+### Instalacja
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+```bash
+# Klonuj repozytorium
+git clone https://github.com/olo-hyphen/fachowiec-pwa.git
+cd fachowiec-pwa
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+# Zainstaluj zależności
+npm install
 
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Uruchom serwer deweloperski
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+Aplikacja będzie dostępna pod adresem `http://localhost:8080`
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Build produkcyjny
 
-**Use GitHub Codespaces**
+```bash
+# Zbuduj aplikację
+npm run build
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+# Podgląd buildu
+npm run preview
+```
 
-## What technologies are used for this project?
+## 📦 Technologie
 
-This project is built with:
+### Frontend
+- **React 18** - biblioteka UI
+- **TypeScript** - typowanie statyczne
+- **Vite** - szybki bundler
+- **TailwindCSS v4** - style CSS
+- **Shadcn UI** - komponenty UI
+- **React Router** - routing
+- **Lucide Icons** - ikony
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+### PWA
+- **Vite PWA Plugin** - generowanie Service Workera
+- **Workbox** - strategia cachowania
+- **Web Manifest** - konfiguracja PWA
 
-## How can I deploy this project?
+### Storage
+- **localStorage** - przechowywanie danych użytkownika
+- **sessionStorage** - dane sesji
 
-Simply open [Lovable](https://lovable.dev/projects/bc0b1eab-7968-470f-9603-e88f62408dc1) and click on Share -> Publish.
+## 🔐 Bezpieczeństwo
 
-## Can I connect a custom domain to my Lovable project?
+- Hasła przechowywane lokalnie (zalecane dodanie hashowania w produkcji)
+- Sesje wygasają po 7 dniach
+- Separacja danych per użytkownik
+- Brak zewnętrznych połączeń (100% offline)
 
-Yes, you can!
+## 📱 Instalacja PWA
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+1. Otwórz aplikację w przeglądarce
+2. Kliknij "Dodaj do ekranu głównego" w menu przeglądarki
+3. Aplikacja zainstaluje się jako natywna aplikacja
+4. Ikona pojawi się na ekranie głównym
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+## 🚀 Wdrożenie
+
+Aplikacja jest gotowa do wdrożenia na:
+
+### Vercel (Zalecane) ⭐
+
+```bash
+# Zainstaluj Vercel CLI
+npm i -g vercel
+
+# Deploy
+vercel --prod
+```
+
+Lub połącz repozytorium przez [vercel.com](https://vercel.com)
+
+### Netlify
+
+```bash
+# Zbuduj projekt
+npm run build
+
+# Przeciągnij folder dist na netlify.com
+```
+
+Lub użyj Netlify CLI:
+
+```bash
+npm i -g netlify-cli
+netlify deploy --prod --dir=dist
+```
+
+### GitHub Pages
+
+Workflow GitHub Actions jest już skonfigurowany w `.github/workflows/deploy.yml`
+
+1. Idź do Settings → Pages
+2. Source: **GitHub Actions**
+3. Push do `main` automatycznie wdroży aplikację
+
+**📖 Szczegółowe instrukcje:** [DEPLOYMENT.md](./DEPLOYMENT.md)  
+**⚡ Szybki przewodnik:** [QUICK_DEPLOY.md](./QUICK_DEPLOY.md)
+
+## 📂 Struktura projektu
+
+```
+fachowiec-pwa/
+├── public/              # Statyczne pliki
+│   ├── icons/          # Ikony PWA
+│   └── manifest.json   # Web Manifest
+├── src/
+│   ├── components/     # Komponenty React
+│   │   ├── ui/        # Shadcn UI komponenty
+│   │   ├── layout/    # Layout komponenty
+│   │   └── auth/      # Komponenty autentykacji
+│   ├── contexts/      # React Contexts
+│   ├── hooks/         # Custom hooks
+│   ├── lib/           # Biblioteki
+│   │   ├── auth.ts   # System autentykacji
+│   │   └── storage.ts # Zarządzanie localStorage
+│   ├── pages/         # Strony aplikacji
+│   └── types/         # TypeScript typy
+├── netlify.toml       # Konfiguracja Netlify
+├── vercel.json        # Konfiguracja Vercel
+└── vite.config.ts     # Konfiguracja Vite + PWA
+```
+
+## 🧪 Testy
+
+```bash
+# Uruchom testy (jeśli zaimplementowane)
+npm test
+
+# Sprawdź build
+npm run build
+
+# Lighthouse audit
+npx lighthouse http://localhost:8080 --view
+```
+
+## 📊 LocalStorage
+
+Aplikacja przechowuje dane w localStorage:
+
+```
+fachowiec_users              - Użytkownicy
+fachowiec_session            - Aktualna sesja
+fachowiec_clients_{userId}   - Klienci
+fachowiec_jobs_{userId}      - Zlecenia
+fachowiec_estimates_{userId} - Kosztorysy
+fachowiec_time_entries_{userId} - Czas pracy
+fachowiec_photos_{userId}    - Zdjęcia
+```
+
+## 🛣️ Roadmap
+
+- [ ] Hashowanie haseł (bcrypt)
+- [ ] Export/Import danych do JSON
+- [ ] Synchronizacja z chmurą (opcjonalna)
+- [ ] Więcej raportów i statystyk
+- [ ] Faktury i płatności
+- [ ] Powiadomienia push
+- [ ] Tryb offline z sync queue
+
+## 🤝 Kontribucje
+
+Pull requesty są mile widziane!
+
+1. Fork projektu
+2. Stwórz branch (`git checkout -b feature/AmazingFeature`)
+3. Commit zmian (`git commit -m 'Add AmazingFeature'`)
+4. Push do brancha (`git push origin feature/AmazingFeature`)
+5. Otwórz Pull Request
+
+## 📄 Licencja
+
+MIT License - zobacz [LICENSE](LICENSE) dla szczegółów
+
+## 👨‍💻 Autor
+
+**OlekTV Olczyk**
+
+- GitHub: [@olo-hyphen](https://github.com/olo-hyphen)
+
+## 🙏 Podziękowania
+
+- [Shadcn UI](https://ui.shadcn.com/) - komponenty UI
+- [Lucide](https://lucide.dev/) - ikony
+- [Vite PWA](https://vite-pwa-org.netlify.app/) - plugin PWA
+
+---
+
+**⚡ Zbudowane z Vite + React + TypeScript + TailwindCSS**
+
+**📱 Offline-first Progressive Web App**
+
+**🎨 Responsywny i nowoczesny design**
