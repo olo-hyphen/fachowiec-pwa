@@ -1,305 +1,230 @@
-import { supabase } from '@/lib/supabaseClient';
+import { getCurrentUser } from './auth';
 
-// Jobs
-export async function getJobs() {
-  const { data: { user } } = await supabase.auth.getUser();
+const STORAGE_KEYS = {
+  JOBS: 'fachowiec_jobs',
+  TIME_ENTRIES: 'fachowiec_time_entries',
+  PHOTOS: 'fachowiec_photos',
+  CLIENTS: 'fachowiec_clients',
+  ESTIMATES: 'fachowiec_estimates',
+};
+
+function generateId(): string {
+  return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+}
+
+function getUserData<T>(key: string): T[] {
+  const user = getCurrentUser();
   if (!user) return [];
 
-  const { data, error } = await supabase
-    .from('jobs')
-    .select('*')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false });
+  const data = localStorage.getItem(`${key}_${user.id}`);
+  return data ? JSON.parse(data) : [];
+}
 
-  if (error) {
-    console.error('Error fetching jobs:', error);
-    return [];
-  }
+function saveUserData<T>(key: string, data: T[]): void {
+  const user = getCurrentUser();
+  if (!user) throw new Error('User not authenticated');
 
-  return data || [];
+  localStorage.setItem(`${key}_${user.id}`, JSON.stringify(data));
+}
+
+export async function getJobs() {
+  return getUserData(STORAGE_KEYS.JOBS);
 }
 
 export async function saveJob(job: any) {
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = getCurrentUser();
   if (!user) throw new Error('User not authenticated');
 
-  // Map frontend fields (camelCase) to backend schema (snake_case) and discard unknown columns
+  const jobs = await getJobs();
   const now = new Date().toISOString();
-  const mappedData: any = {
-    title: job.title,
-    description: job.description ?? null,
-    status: job.status ?? 'pending',
-    priority: job.priority ?? 'medium',
-    estimated_hours: job.estimatedHours ?? null,
-    hourly_rate: job.hourlyRate ?? null,
-    total_cost: job.totalCost ?? null,
-    notes: job.notes ?? null,
-    user_id: user.id,
-    updated_at: now,
-  };
 
-  if (job.completedAt) mappedData.completed_at = job.completedAt;
-
-  // Update only if id is a valid UUID; otherwise insert a new row
-  const isUuid = (val: string) =>
-    typeof val === 'string' &&
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(val);
-
-  if (isUuid(job.id)) {
-    const { error } = await supabase
-      .from('jobs')
-      .update(mappedData)
-      .eq('id', job.id)
-      .eq('user_id', user.id);
-
-    if (error) throw error;
+  if (job.id && job.id.includes('-')) {
+    const index = jobs.findIndex((j: any) => j.id === job.id);
+    if (index !== -1) {
+      jobs[index] = { ...job, user_id: user.id, updated_at: now };
+    } else {
+      jobs.push({ ...job, user_id: user.id, created_at: now, updated_at: now });
+    }
   } else {
-    const { error } = await supabase
-      .from('jobs')
-      .insert([mappedData]);
-
-    if (error) throw error;
+    const newJob = {
+      ...job,
+      id: generateId(),
+      user_id: user.id,
+      created_at: now,
+      updated_at: now,
+    };
+    jobs.push(newJob);
   }
+
+  saveUserData(STORAGE_KEYS.JOBS, jobs);
 }
 
 export async function deleteJob(jobId: string) {
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = getCurrentUser();
   if (!user) throw new Error('User not authenticated');
 
-  const { error } = await supabase
-    .from('jobs')
-    .delete()
-    .eq('id', jobId)
-    .eq('user_id', user.id);
+  const jobs = await getJobs();
+  const filteredJobs = jobs.filter((j: any) => j.id !== jobId);
 
-  if (error) throw error;
+  saveUserData(STORAGE_KEYS.JOBS, filteredJobs);
 }
 
-// Time Entries
 export async function getTimeEntries() {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return [];
-
-  const { data, error } = await supabase
-    .from('time_entries')
-    .select('*')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false });
-
-  if (error) {
-    console.error('Error fetching time entries:', error);
-    return [];
-  }
-
-  return data || [];
+  return getUserData(STORAGE_KEYS.TIME_ENTRIES);
 }
 
 export async function saveTimeEntry(timeEntry: any) {
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = getCurrentUser();
   if (!user) throw new Error('User not authenticated');
 
-  const entryData = {
-    ...timeEntry,
-    user_id: user.id
-  };
+  const entries = await getTimeEntries();
+  const now = new Date().toISOString();
 
   if (timeEntry.id) {
-    const { error } = await supabase
-      .from('time_entries')
-      .update(entryData)
-      .eq('id', timeEntry.id)
-      .eq('user_id', user.id);
-
-    if (error) throw error;
+    const index = entries.findIndex((e: any) => e.id === timeEntry.id);
+    if (index !== -1) {
+      entries[index] = { ...timeEntry, user_id: user.id };
+    } else {
+      entries.push({ ...timeEntry, user_id: user.id, created_at: now });
+    }
   } else {
-    const { error } = await supabase
-      .from('time_entries')
-      .insert([entryData]);
-
-    if (error) throw error;
+    const newEntry = {
+      ...timeEntry,
+      id: generateId(),
+      user_id: user.id,
+      created_at: now,
+    };
+    entries.push(newEntry);
   }
+
+  saveUserData(STORAGE_KEYS.TIME_ENTRIES, entries);
 }
 
 export async function deleteTimeEntry(entryId: string) {
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = getCurrentUser();
   if (!user) throw new Error('User not authenticated');
 
-  const { error } = await supabase
-    .from('time_entries')
-    .delete()
-    .eq('id', entryId)
-    .eq('user_id', user.id);
+  const entries = await getTimeEntries();
+  const filteredEntries = entries.filter((e: any) => e.id !== entryId);
 
-  if (error) throw error;
+  saveUserData(STORAGE_KEYS.TIME_ENTRIES, filteredEntries);
 }
 
-// Photos
 export async function getPhotos() {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return [];
-
-  const { data, error } = await supabase
-    .from('photos')
-    .select('*')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false });
-
-  if (error) {
-    console.error('Error fetching photos:', error);
-    return [];
-  }
-
-  return data || [];
+  return getUserData(STORAGE_KEYS.PHOTOS);
 }
 
 export async function savePhoto(photo: any) {
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = getCurrentUser();
   if (!user) throw new Error('User not authenticated');
 
-  const photoData = {
+  const photos = await getPhotos();
+  const now = new Date().toISOString();
+
+  const newPhoto = {
     ...photo,
-    user_id: user.id
+    id: generateId(),
+    user_id: user.id,
+    created_at: now,
   };
 
-  const { error } = await supabase
-    .from('photos')
-    .insert([photoData]);
-
-  if (error) throw error;
+  photos.push(newPhoto);
+  saveUserData(STORAGE_KEYS.PHOTOS, photos);
 }
 
 export async function deletePhoto(photoId: string) {
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = getCurrentUser();
   if (!user) throw new Error('User not authenticated');
 
-  const { error } = await supabase
-    .from('photos')
-    .delete()
-    .eq('id', photoId)
-    .eq('user_id', user.id);
+  const photos = await getPhotos();
+  const filteredPhotos = photos.filter((p: any) => p.id !== photoId);
 
-  if (error) throw error;
+  saveUserData(STORAGE_KEYS.PHOTOS, filteredPhotos);
 }
 
-// Clients
 export async function getClients() {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return [];
-
-  const { data, error } = await supabase
-    .from('clients')
-    .select('*')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false });
-
-  if (error) {
-    console.error('Error fetching clients:', error);
-    return [];
-  }
-
-  return data || [];
+  return getUserData(STORAGE_KEYS.CLIENTS);
 }
 
 export async function saveClient(client: any) {
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = getCurrentUser();
   if (!user) throw new Error('User not authenticated');
 
-  const clientData = {
-    ...client,
-    user_id: user.id,
-    updated_at: new Date().toISOString()
-  };
+  const clients = await getClients();
+  const now = new Date().toISOString();
 
   if (client.id) {
-    const { error } = await supabase
-      .from('clients')
-      .update(clientData)
-      .eq('id', client.id)
-      .eq('user_id', user.id);
-
-    if (error) throw error;
+    const index = clients.findIndex((c: any) => c.id === client.id);
+    if (index !== -1) {
+      clients[index] = { ...client, user_id: user.id, updated_at: now };
+    } else {
+      clients.push({ ...client, user_id: user.id, created_at: now, updated_at: now });
+    }
   } else {
-    const { error } = await supabase
-      .from('clients')
-      .insert([clientData]);
-
-    if (error) throw error;
+    const newClient = {
+      ...client,
+      id: generateId(),
+      user_id: user.id,
+      created_at: now,
+      updated_at: now,
+    };
+    clients.push(newClient);
   }
+
+  saveUserData(STORAGE_KEYS.CLIENTS, clients);
 }
 
 export async function deleteClient(clientId: string) {
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = getCurrentUser();
   if (!user) throw new Error('User not authenticated');
 
-  const { error } = await supabase
-    .from('clients')
-    .delete()
-    .eq('id', clientId)
-    .eq('user_id', user.id);
+  const clients = await getClients();
+  const filteredClients = clients.filter((c: any) => c.id !== clientId);
 
-  if (error) throw error;
+  saveUserData(STORAGE_KEYS.CLIENTS, filteredClients);
 }
 
-// Cost Estimates
 export async function getEstimates() {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return [];
-
-  const { data, error } = await supabase
-    .from('cost_estimates')
-    .select('*')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false });
-
-  if (error) {
-    console.error('Error fetching estimates:', error);
-    return [];
-  }
-
-  return data || [];
+  return getUserData(STORAGE_KEYS.ESTIMATES);
 }
 
 export async function saveEstimate(estimate: any) {
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = getCurrentUser();
   if (!user) throw new Error('User not authenticated');
 
-  const estimateData = {
-    ...estimate,
-    user_id: user.id,
-    updated_at: new Date().toISOString()
-  };
+  const estimates = await getEstimates();
+  const now = new Date().toISOString();
 
   if (estimate.id) {
-    const { error } = await supabase
-      .from('cost_estimates')
-      .update(estimateData)
-      .eq('id', estimate.id)
-      .eq('user_id', user.id);
-
-    if (error) throw error;
+    const index = estimates.findIndex((e: any) => e.id === estimate.id);
+    if (index !== -1) {
+      estimates[index] = { ...estimate, user_id: user.id, updated_at: now };
+    } else {
+      estimates.push({ ...estimate, user_id: user.id, created_at: now, updated_at: now });
+    }
   } else {
-    const { error } = await supabase
-      .from('cost_estimates')
-      .insert([estimateData]);
-
-    if (error) throw error;
+    const newEstimate = {
+      ...estimate,
+      id: generateId(),
+      user_id: user.id,
+      created_at: now,
+      updated_at: now,
+    };
+    estimates.push(newEstimate);
   }
+
+  saveUserData(STORAGE_KEYS.ESTIMATES, estimates);
 }
 
 export async function deleteEstimate(estimateId: string) {
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = getCurrentUser();
   if (!user) throw new Error('User not authenticated');
 
-  const { error } = await supabase
-    .from('cost_estimates')
-    .delete()
-    .eq('id', estimateId)
-    .eq('user_id', user.id);
+  const estimates = await getEstimates();
+  const filteredEstimates = estimates.filter((e: any) => e.id !== estimateId);
 
-  if (error) throw error;
+  saveUserData(STORAGE_KEYS.ESTIMATES, filteredEstimates);
 }
 
-// Initialize with sample data - no longer needed with real auth
 export function initializeSampleData(): void {
-  // Sample data initialization removed - users will create their own data
 }

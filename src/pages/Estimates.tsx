@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabaseClient";
+import { getEstimates, saveEstimate, getClients } from "@/lib/storage";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -58,34 +58,24 @@ export default function Estimates() {
   }, []);
 
   const fetchEstimates = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-
-    const { data, error } = await supabase
-      .from("cost_estimates")
-      .select("*")
-      .eq('user_id', user.id)
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      toast({ title: "Error", description: "Failed to load estimates", variant: "destructive" });
-    } else {
-      setEstimates((data || []).map(item => ({
+    try {
+      const data = await getEstimates();
+      setEstimates(data.map((item: any) => ({
         ...item,
-        items: Array.isArray(item.items) ? item.items as unknown as EstimateItem[] : []
+        items: Array.isArray(item.items) ? item.items : []
       })));
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to load estimates", variant: "destructive" });
     }
   };
 
   const fetchClients = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-
-    const { data, error } = await supabase
-      .from("clients")
-      .select("id, name")
-      .eq('user_id', user.id);
-    if (!error) setClients(data || []);
+    try {
+      const data = await getClients();
+      setClients(data);
+    } catch (error) {
+      console.error('Error fetching clients:', error);
+    }
   };
 
   const calculateTotals = () => {
@@ -112,35 +102,28 @@ export default function Estimates() {
       total_amount,
       valid_until: formData.valid_until || null,
       status: "draft",
-      user_id: (await supabase.auth.getUser()).data.user?.id
     };
 
-    const { error } = await supabase.from("cost_estimates").insert([estimateData]);
-
-    if (error) {
-      toast({ title: "Error", description: "Failed to create estimate", variant: "destructive" });
-    } else {
+    try {
+      await saveEstimate(estimateData);
       toast({ title: "Success", description: "Estimate created successfully" });
       fetchEstimates();
       closeDialog();
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to create estimate", variant: "destructive" });
     }
   };
 
   const updateStatus = async (id: string, status: string) => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-
-    const { error } = await supabase
-      .from("cost_estimates")
-      .update({ status })
-      .eq("id", id)
-      .eq('user_id', user.id);
-
-    if (error) {
+    try {
+      const estimate = estimates.find(e => e.id === id);
+      if (estimate) {
+        await saveEstimate({ ...estimate, id, status });
+        toast({ title: "Success", description: "Status updated" });
+        fetchEstimates();
+      }
+    } catch (error) {
       toast({ title: "Error", description: "Failed to update status", variant: "destructive" });
-    } else {
-      toast({ title: "Success", description: "Status updated" });
-      fetchEstimates();
     }
   };
 

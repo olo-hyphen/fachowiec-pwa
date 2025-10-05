@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabaseClient";
+import { getJobs } from "@/lib/storage";
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -25,22 +25,20 @@ export default function Calendar() {
   }, [currentDate]);
 
   const fetchJobs = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    try {
+      const allJobs = await getJobs();
+      const start = startOfMonth(currentDate);
+      const end = endOfMonth(currentDate);
 
-    const start = startOfMonth(currentDate);
-    const end = endOfMonth(currentDate);
+      const filteredJobs = allJobs.filter((job: any) => {
+        if (!job.scheduled_date) return false;
+        const jobDate = new Date(job.scheduled_date);
+        return jobDate >= start && jobDate <= end;
+      });
 
-    const { data, error } = await supabase
-      .from("jobs")
-      .select("*")
-      .eq('user_id', user.id)
-      .gte("scheduled_date", format(start, "yyyy-MM-dd"))
-      .lte("scheduled_date", format(end, "yyyy-MM-dd"))
-      .order("scheduled_date");
-
-    if (!error) {
-      setJobs(data || []);
+      setJobs(filteredJobs);
+    } catch (error) {
+      console.error('Error fetching jobs:', error);
     }
   };
 
@@ -129,12 +127,10 @@ export default function Calendar() {
               ))}
             </div>
             <div className="grid grid-cols-7 gap-2">
-              {/* Empty cells for days before month starts */}
               {Array.from({ length: (startOfMonth(currentDate).getDay() + 6) % 7 }).map((_, i) => (
                 <div key={`empty-${i}`} className="aspect-square" />
               ))}
               
-              {/* Calendar days */}
               {days.map((day) => {
                 const dayJobs = getJobsForDate(day);
                 const isToday = isSameDay(day, new Date());
