@@ -49,7 +49,8 @@ export default function Jobs() {
     status: 'pending' as JobStatus,
     priority: 'medium' as JobPriority,
     tags: '',
-    notes: ''
+    notes: '',
+    scheduled_date: ''
   });
 
   useEffect(() => {
@@ -123,7 +124,8 @@ export default function Jobs() {
       status: 'pending',
       priority: 'medium',
       tags: '',
-      notes: ''
+      notes: '',
+      scheduled_date: ''
     });
     setEditingJob(null);
   };
@@ -159,6 +161,7 @@ export default function Jobs() {
       category: formData.category,
       tags: formData.tags ? formData.tags.split(',').map(t => t.trim()).filter(Boolean) : [],
       notes: formData.notes,
+      scheduled_date: formData.scheduled_date || null,
       createdAt: editingJob?.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       ...(formData.status === 'completed' && !editingJob?.completedAt && {
@@ -192,7 +195,8 @@ export default function Jobs() {
       status: job.status,
       priority: job.priority || 'medium',
       tags: job.tags?.join(', ') || '',
-      notes: job.notes || ''
+      notes: job.notes || '',
+      scheduled_date: job.scheduled_date || ''
     });
     setIsDialogOpen(true);
   };
@@ -454,6 +458,16 @@ export default function Jobs() {
                       placeholder="80"
                     />
                   </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="scheduled_date">Data realizacji</Label>
+                  <Input
+                    id="scheduled_date"
+                    type="date"
+                    value={formData.scheduled_date}
+                    onChange={(e) => setFormData({ ...formData, scheduled_date: e.target.value })}
+                  />
                 </div>
 
                 <div>
