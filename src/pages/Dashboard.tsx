@@ -37,9 +37,9 @@ export default function Dashboard() {
       const jobs = await getJobs();
       const timeEntries = await getTimeEntries();
 
-      const completedJobs = jobs.filter((job: any) => job.status === 'completed');
-      const activeJobs = jobs.filter((job: any) => job.status === 'in-progress');
-      const totalRevenue = completedJobs.reduce((sum: number, job: any) => sum + (job.actual_cost || 0), 0);
+      const completedJobs = jobs.filter((job: Job) => job.status === 'completed');
+      const activeJobs = jobs.filter((job: Job) => job.status === 'in-progress');
+      const totalRevenue = completedJobs.reduce((sum: number, job: Job) => sum + (job.totalCost || 0), 0);
 
       const avgDuration = timeEntries.length > 0 
         ? timeEntries.reduce((sum: number, entry: any) => sum + (entry.duration || 0), 0) / timeEntries.length / 60
