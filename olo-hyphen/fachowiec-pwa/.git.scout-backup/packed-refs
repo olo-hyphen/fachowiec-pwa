@@ -1,0 +1,19 @@
+# pack-refs with: peeled fully-peeled sorted 
+04400a28aa2c280a97a0e6dc709963cdb1d77acc refs/remotes/origin/capy/add-deployment-configs
+ad1e63a8f629f372f544b351b63c19e951a6c51f refs/remotes/origin/capy/cap-1-4b472059
+04b8af2026611e160e5af153fc1272cd5df79b8b refs/remotes/origin/capy/cap-1-c629423b
+c3ec352507c6882dbc9747426d96bf42f6e99a9e refs/remotes/origin/capy/cap-3-d3e71f73
+075d806ae5ec7db45432d2998e2c93f887a18bba refs/remotes/origin/capy/deploy-fachowiec-pwa-9b72b8c8
+1ff65d1ae18c0904d3d4263a9a58883d4ae5d968 refs/remotes/origin/capy/dodaj-date-picker-do-9dad50f4
+a9152e74993fc09ac793fe43a590a830c5ce2a26 refs/remotes/origin/capy/dodaj-onboarding-tou-dbc38f5f
+f23b32d3c3aae7ece71aa6ab15b0efb7180d0b4d refs/remotes/origin/capy/implementacja-konfig-e8ea81a5
+120b46ce5b28638140c6b82b13e36c9a99953433 refs/remotes/origin/capy/implementuj-loading--413f3b32
+114814b498facf1045f829856305e7311924d8bf refs/remotes/origin/capy/implementuj-loading--487072ff
+5c695716ceb2f569145c709d0946bb2ba9fc90a1 refs/remotes/origin/capy/napraw-przeczanie-kr-1b8ad1a3
+f8a61b069932c082f028a6206c32b23491fa6afa refs/remotes/origin/capy/remove-deprecated-ty-6e47baa4
+bd975612e1756a0f79919e686aadc010adbf326a refs/remotes/origin/capy/set-up-and-run-local-0ee4177e
+a2ae2e885d4e84adf27369c469742e83378925c1 refs/remotes/origin/capy/usu-ekran-logowania--2e4d5d4c
+33c0eb85966f61de9dacd5aaba2d3a77d89a900e refs/remotes/origin/feat/loading-skeletons
+070764256bc4a7dd4be063e2724efe7683f4fb39 refs/remotes/origin/fix-vite-host
+6004f3ff4f5375262a60880b2d3461ca68100857 refs/remotes/origin/main
+8f196d59b4150a5ff089d72390c935c07150e225 refs/remotes/origin/remove-login-screen-ntl-68e28a8c2d1c5baa143b366b
