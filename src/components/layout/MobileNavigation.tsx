@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from "react-router-dom";
-import { Home, Briefcase, Users, FileText, Calendar, Plus, Clock } from "lucide-react";
+import { Home, Briefcase, Users, FileText, Calendar, Plus, Clock, Settings } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
@@ -10,6 +10,7 @@ const navigation = [
   { name: "Klienci", href: "/clients", icon: Users },
   { name: "Kosztorysy", href: "/estimates", icon: FileText },
   { name: "Kalendarz", href: "/calendar", icon: Calendar },
+  { name: "Ustawienia", href: "/settings", icon: Settings },
 ];
 
 export default function MobileNavigation() {

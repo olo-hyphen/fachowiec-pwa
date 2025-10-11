@@ -17,11 +17,21 @@ import Calendar from "./pages/Calendar";
 import Navbar from "./components/layout/Navbar";
 import MobileNavigation from "./components/layout/MobileNavigation";
 import NotFound from "./pages/NotFound";
+import Settings from "./pages/Settings";
+import { useNotifications } from "./hooks/useNotifications";
+import { useEffect } from 'react';
 
 const queryClient = new QueryClient();
 
 function AppContent() {
   useKeyboardShortcuts();
+  const { checkAndNotify } = useNotifications();
+
+  useEffect(() => {
+    checkAndNotify();
+    const interval = setInterval(checkAndNotify, 60 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, [checkAndNotify]);
   
   return (
     <div className="min-h-screen bg-background transition-colors duration-300">
@@ -35,6 +45,7 @@ function AppContent() {
           <Route path="/clients" element={<Clients />} />
           <Route path="/estimates" element={<Estimates />} />
           <Route path="/calendar" element={<Calendar />} />
+          <Route path="/settings" element={<Settings />} />
           <Route path="/reports" element={<div className="p-4 md:p-8"><h1 className="text-2xl font-poppins">Raporty - W przygotowaniu</h1></div>} />
           <Route path="*" element={<NotFound />} />
         </Routes>
