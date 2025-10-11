@@ -18,6 +18,22 @@ export default {
         'safe-top': 'env(safe-area-inset-top)',
         'safe-left': 'env(safe-area-inset-left)',
         'safe-right': 'env(safe-area-inset-right)',
+        '18': '4.5rem',
+        '88': '22rem',
+      },
+      backdropBlur: {
+        xs: '2px',
+        '3xl': '64px',
+      },
+      backdropSaturate: {
+        120: '1.2',
+        160: '1.6',
+        180: '1.8',
+        200: '2',
+      },
+      scale: {
+        102: '1.02',
+        98: '0.98',
       },
       fontFamily: {
         'inter': ['Inter', 'sans-serif'],

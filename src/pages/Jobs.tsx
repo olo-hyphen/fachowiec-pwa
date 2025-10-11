@@ -311,13 +311,13 @@ export default function Jobs() {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-safe">
+    <div className="min-h-screen mesh-bg pb-safe">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 gap-4">
+        {/* Header with Enhanced Styling */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 gap-4 animate-slide-up-fade">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">Zlecenia</h1>
-            <p className="text-base text-muted-foreground">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-hero bg-clip-text text-transparent font-poppins mb-2">Zlecenia</h1>
+            <p className="text-sm md:text-base text-muted-foreground font-inter">
               Zarządzaj swoimi zleceniami i projektami
             </p>
           </div>
@@ -327,7 +327,7 @@ export default function Jobs() {
               <Button
                 data-tour="add-job-button"
                 onClick={resetForm}
-                className="bg-gradient-primary hover:bg-gradient-primary/90 shadow-soft w-full sm:w-auto"
+                className="bg-gradient-primary hover:shadow-glow transition-glass active-press w-full sm:w-auto shadow-medium"
               >
                 <Plus className="h-4 w-4 mr-2" />
                 Nowe zlecenie
@@ -573,8 +573,8 @@ export default function Jobs() {
           </Dialog>
         </div>
 
-        {/* Filters */}
-        <Card className="mb-6 shadow-soft">
+        {/* Filters with Glass Effect */}
+        <Card className="mb-6 md:mb-8 glass-premium border-none shadow-medium">
           <CardContent className="p-4 sm:p-6">
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-3">
@@ -654,16 +654,29 @@ export default function Jobs() {
           </CardContent>
         </Card>
 
-        {/* Jobs List */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        {/* Enhanced Jobs List */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
           {filteredJobs.map((job, index) => (
-            <Card key={job.id} data-tour={index === 0 ? 'job-card' : undefined} className="shadow-soft hover:shadow-medium transition-all hover-scale">
-              <CardHeader className="pb-3 p-4 sm:p-6">
+            <Card 
+              key={job.id} 
+              data-tour={index === 0 ? 'job-card' : undefined} 
+              className="glass-premium border-none shadow-medium hover-lift hover-glow transition-glass group overflow-hidden animate-slide-up-fade"
+              style={{ animationDelay: `${index * 50}ms` }}
+            >
+              {/* Status Indicator Bar */}
+              <div className={`h-1.5 w-full ${
+                job.status === 'completed' ? 'bg-success' :
+                job.status === 'in-progress' ? 'bg-info' :
+                job.status === 'pending' ? 'bg-warning' :
+                'bg-destructive'
+              }`} />
+              
+              <CardHeader className="pb-3 p-5 md:p-6">
                 <div className="flex justify-between items-start gap-2">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2">
                       {getPriorityIcon(job.priority)}
-                      <CardTitle className="text-base sm:text-lg truncate">{job.title}</CardTitle>
+                      <CardTitle className="text-base sm:text-lg font-poppins group-hover:text-primary transition-colors truncate">{job.title}</CardTitle>
                     </div>
                     <div className="flex items-center gap-2 flex-wrap">
                       <Badge variant={getStatusBadgeVariant(job.status)} className="flex items-center gap-1 text-xs">
@@ -682,7 +695,7 @@ export default function Jobs() {
                       variant="ghost"
                       size="sm"
                       onClick={() => handleEdit(job)}
-                      className="h-8 w-8 p-0"
+                      className="h-8 w-8 p-0 glass-subtle hover-glow active-press"
                     >
                       <Edit className="h-3.5 w-3.5" />
                     </Button>
@@ -690,17 +703,17 @@ export default function Jobs() {
                       variant="ghost"
                       size="sm"
                       onClick={() => handleDelete(job)}
-                      className="h-8 w-8 p-0"
+                      className="h-8 w-8 p-0 glass-subtle hover-glow active-press"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </Button>
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="space-y-3 p-4 sm:p-6 pt-0 sm:pt-0">
+              <CardContent className="space-y-3 p-5 md:p-6 pt-0">
                 <div>
-                  <p className="text-sm text-foreground font-medium">{job.clientName}</p>
-                  <p className="text-sm text-muted-foreground">{job.address}</p>
+                  <p className="text-sm text-foreground font-semibold font-inter">{job.clientName}</p>
+                  <p className="text-sm text-muted-foreground line-clamp-1">{job.address}</p>
                 </div>
                 
                 {job.description && (
@@ -720,20 +733,20 @@ export default function Jobs() {
                   </div>
                 )}
 
-                <div className="flex justify-between items-end pt-2 border-t">
+                <div className="flex justify-between items-end pt-3 border-t border-primary/10">
                   <div>
-                    <p className="text-xs text-muted-foreground mb-1">
+                    <p className="text-xs text-muted-foreground mb-1 font-inter">
                       {job.estimatedHours}h × {job.hourlyRate} zł/h
                     </p>
                     {job.category && (
-                      <Badge variant="outline" className="text-xs">
+                      <Badge variant="outline" className="text-xs glass-subtle">
                         {job.category}
                       </Badge>
                     )}
                   </div>
                   <div className="text-right">
-                    <p className="text-xs text-muted-foreground">Wartość</p>
-                    <p className="text-lg font-bold text-foreground">
+                    <p className="text-xs text-muted-foreground font-inter">Wartość</p>
+                    <p className="text-lg md:text-xl font-bold bg-gradient-primary bg-clip-text text-transparent font-poppins">
                       {job.totalCost.toLocaleString('pl-PL')} zł
                     </p>
                   </div>
@@ -745,7 +758,7 @@ export default function Jobs() {
                       <Button
                         size="sm"
                         variant="outline"
-                        className="flex-1 text-xs"
+                        className="flex-1 text-xs glass-card border-primary/30 hover-glow active-press"
                         onClick={() => handleQuickStatusChange(job, 'in-progress')}
                       >
                         <Activity className="h-3 w-3 mr-1" />
@@ -756,7 +769,7 @@ export default function Jobs() {
                       <Button
                         size="sm"
                         variant="outline"
-                        className="flex-1 text-xs"
+                        className="flex-1 text-xs glass-card border-primary/30 hover-glow active-press"
                         onClick={() => handleQuickStatusChange(job, 'completed')}
                       >
                         <CheckCircle className="h-3 w-3 mr-1" />
@@ -779,8 +792,8 @@ export default function Jobs() {
         </div>
 
         {filteredJobs.length === 0 && (
-          <Card className="shadow-soft">
-            <CardContent className="p-12 text-center">
+          <Card className="glass-premium border-none shadow-medium">
+            <CardContent className="p-12 md:p-16 text-center">
               <h3 className="text-lg font-medium text-muted-foreground mb-2">
                 Brak zleceń
               </h3>

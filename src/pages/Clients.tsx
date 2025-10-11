@@ -115,23 +115,23 @@ export default function Clients() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20 pb-24">
-      <div className="container mx-auto p-4 md:p-6 space-y-6 animate-fade-in">
-        <div className="flex items-center justify-between">
+    <div className="min-h-screen mesh-bg pb-24">
+      <div className="container mx-auto p-4 md:p-8 space-y-8 animate-fade-in">
+        <div className="flex items-center justify-between animate-slide-up-fade">
           <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-hero bg-clip-text text-transparent font-poppins">
               Klienci
             </h1>
-            <p className="text-muted-foreground mt-1">Zarządzaj bazą klientów</p>
+            <p className="text-muted-foreground mt-2 font-inter text-sm md:text-base">Zarządzaj bazą klientów</p>
           </div>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="gap-2">
+              <Button className="gap-2 bg-gradient-primary hover:shadow-glow transition-glass active-press shadow-medium">
                 <Plus className="h-4 w-4" />
                 Dodaj klienta
               </Button>
             </DialogTrigger>
-            <DialogContent className="glass-effect max-w-2xl">
+            <DialogContent className="glass-premium max-w-2xl">
               <DialogHeader>
                 <DialogTitle>
                   {editingClient ? "Edytuj klienta" : "Nowy klient"}
