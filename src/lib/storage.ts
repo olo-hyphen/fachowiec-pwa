@@ -1,4 +1,26 @@
-import { getCurrentUser } from './auth';
+export interface User {
+  id: string;
+  email: string;
+  full_name?: string;
+  created_at: string;
+}
+
+const DEMO_USER_KEY = 'fachowiec_user';
+
+function getOrCreateDemoUser(): User {
+  let userStr = localStorage.getItem(DEMO_USER_KEY);
+  if (!userStr) {
+    const user: User = {
+      id: 'demo-user',
+      email: 'demo@fachowiec.pl',
+      full_name: 'Demo Użytkownik',
+      created_at: new Date().toISOString()
+    };
+    localStorage.setItem(DEMO_USER_KEY, JSON.stringify(user));
+    return user;
+  }
+  return JSON.parse(userStr) as User;
+}
 
 const STORAGE_KEYS = {
   JOBS: 'fachowiec_jobs',
@@ -13,16 +35,14 @@ function generateId(): string {
 }
 
 function getUserData<T>(key: string): T[] {
-  const user = getCurrentUser();
-  if (!user) return [];
+  const user = getOrCreateDemoUser();
 
   const data = localStorage.getItem(`${key}_${user.id}`);
   return data ? JSON.parse(data) : [];
 }
 
 function saveUserData<T>(key: string, data: T[]): void {
-  const user = getCurrentUser();
-  if (!user) throw new Error('User not authenticated');
+  const user = getOrCreateDemoUser();
 
   localStorage.setItem(`${key}_${user.id}`, JSON.stringify(data));
 }
@@ -32,24 +52,21 @@ export async function getJobs() {
 }
 
 export async function saveJob(job: any) {
-  const user = getCurrentUser();
-  if (!user) throw new Error('User not authenticated');
-
   const jobs = await getJobs();
   const now = new Date().toISOString();
 
   if (job.id && job.id.includes('-')) {
     const index = jobs.findIndex((j: any) => j.id === job.id);
     if (index !== -1) {
-      jobs[index] = { ...job, user_id: user.id, updated_at: now };
+      jobs[index] = { ...job, user_id: 'demo-user', updated_at: now };
     } else {
-      jobs.push({ ...job, user_id: user.id, created_at: now, updated_at: now });
+      jobs.push({ ...job, user_id: 'demo-user', created_at: now, updated_at: now });
     }
   } else {
     const newJob = {
       ...job,
       id: generateId(),
-      user_id: user.id,
+      user_id: 'demo-user',
       created_at: now,
       updated_at: now,
     };
@@ -60,9 +77,6 @@ export async function saveJob(job: any) {
 }
 
 export async function deleteJob(jobId: string) {
-  const user = getCurrentUser();
-  if (!user) throw new Error('User not authenticated');
-
   const jobs = await getJobs();
   const filteredJobs = jobs.filter((j: any) => j.id !== jobId);
 
@@ -74,24 +88,21 @@ export async function getTimeEntries() {
 }
 
 export async function saveTimeEntry(timeEntry: any) {
-  const user = getCurrentUser();
-  if (!user) throw new Error('User not authenticated');
-
   const entries = await getTimeEntries();
   const now = new Date().toISOString();
 
   if (timeEntry.id) {
     const index = entries.findIndex((e: any) => e.id === timeEntry.id);
     if (index !== -1) {
-      entries[index] = { ...timeEntry, user_id: user.id };
+      entries[index] = { ...timeEntry, user_id: 'demo-user' };
     } else {
-      entries.push({ ...timeEntry, user_id: user.id, created_at: now });
+      entries.push({ ...timeEntry, user_id: 'demo-user', created_at: now });
     }
   } else {
     const newEntry = {
       ...timeEntry,
       id: generateId(),
-      user_id: user.id,
+      user_id: 'demo-user',
       created_at: now,
     };
     entries.push(newEntry);
@@ -101,9 +112,6 @@ export async function saveTimeEntry(timeEntry: any) {
 }
 
 export async function deleteTimeEntry(entryId: string) {
-  const user = getCurrentUser();
-  if (!user) throw new Error('User not authenticated');
-
   const entries = await getTimeEntries();
   const filteredEntries = entries.filter((e: any) => e.id !== entryId);
 
@@ -115,16 +123,13 @@ export async function getPhotos() {
 }
 
 export async function savePhoto(photo: any) {
-  const user = getCurrentUser();
-  if (!user) throw new Error('User not authenticated');
-
   const photos = await getPhotos();
   const now = new Date().toISOString();
 
   const newPhoto = {
     ...photo,
     id: generateId(),
-    user_id: user.id,
+    user_id: 'demo-user',
     created_at: now,
   };
 
@@ -133,9 +138,6 @@ export async function savePhoto(photo: any) {
 }
 
 export async function deletePhoto(photoId: string) {
-  const user = getCurrentUser();
-  if (!user) throw new Error('User not authenticated');
-
   const photos = await getPhotos();
   const filteredPhotos = photos.filter((p: any) => p.id !== photoId);
 
@@ -147,24 +149,21 @@ export async function getClients() {
 }
 
 export async function saveClient(client: any) {
-  const user = getCurrentUser();
-  if (!user) throw new Error('User not authenticated');
-
   const clients = await getClients();
   const now = new Date().toISOString();
 
   if (client.id) {
     const index = clients.findIndex((c: any) => c.id === client.id);
     if (index !== -1) {
-      clients[index] = { ...client, user_id: user.id, updated_at: now };
+      clients[index] = { ...client, user_id: 'demo-user', updated_at: now };
     } else {
-      clients.push({ ...client, user_id: user.id, created_at: now, updated_at: now });
+      clients.push({ ...client, user_id: 'demo-user', created_at: now, updated_at: now });
     }
   } else {
     const newClient = {
       ...client,
       id: generateId(),
-      user_id: user.id,
+      user_id: 'demo-user',
       created_at: now,
       updated_at: now,
     };
@@ -175,9 +174,6 @@ export async function saveClient(client: any) {
 }
 
 export async function deleteClient(clientId: string) {
-  const user = getCurrentUser();
-  if (!user) throw new Error('User not authenticated');
-
   const clients = await getClients();
   const filteredClients = clients.filter((c: any) => c.id !== clientId);
 
@@ -189,24 +185,21 @@ export async function getEstimates() {
 }
 
 export async function saveEstimate(estimate: any) {
-  const user = getCurrentUser();
-  if (!user) throw new Error('User not authenticated');
-
   const estimates = await getEstimates();
   const now = new Date().toISOString();
 
   if (estimate.id) {
     const index = estimates.findIndex((e: any) => e.id === estimate.id);
     if (index !== -1) {
-      estimates[index] = { ...estimate, user_id: user.id, updated_at: now };
+      estimates[index] = { ...estimate, user_id: 'demo-user', updated_at: now };
     } else {
-      estimates.push({ ...estimate, user_id: user.id, created_at: now, updated_at: now });
+      estimates.push({ ...estimate, user_id: 'demo-user', created_at: now, updated_at: now });
     }
   } else {
     const newEstimate = {
       ...estimate,
       id: generateId(),
-      user_id: user.id,
+      user_id: 'demo-user',
       created_at: now,
       updated_at: now,
     };
@@ -217,9 +210,6 @@ export async function saveEstimate(estimate: any) {
 }
 
 export async function deleteEstimate(estimateId: string) {
-  const user = getCurrentUser();
-  if (!user) throw new Error('User not authenticated');
-
   const estimates = await getEstimates();
   const filteredEstimates = estimates.filter((e: any) => e.id !== estimateId);
 
