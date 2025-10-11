@@ -72,10 +72,12 @@ export default function Jobs() {
 
   const loadJobs = async () => {
     setIsLoading(true);
-    const allJobs = await getJobs();
-    setJobs(allJobs as any);
-    setIsLoading(false);
-  };
+    try {
+      const allJobs = await getJobs();
+      setJobs(allJobs as any);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const filterJobs = () => {
@@ -98,7 +100,6 @@ export default function Jobs() {
       filtered = filtered.filter(job => job.priority === priorityFilter);
     }
 
-    // Sortowanie
     filtered.sort((a, b) => {
       switch (sortBy) {
         case 'date-desc':
@@ -106,7 +107,7 @@ export default function Jobs() {
         case 'date-asc':
           return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
         case 'priority':
-          const priorityOrder = { urgent: 4, high: 3, medium: 2, low: 1 };
+          const priorityOrder = { urgent: 4, high: 3, medium: 2, low: 1 } as const;
           return (priorityOrder[b.priority || 'medium'] || 0) - (priorityOrder[a.priority || 'medium'] || 0);
         case 'cost-desc':
           return b.totalCost - a.totalCost;
@@ -146,10 +147,9 @@ export default function Jobs() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
     const estimatedHours = parseInt(formData.estimatedHours);
     const hourlyRate = parseInt(formData.hourlyRate);
-    
+
     if (!formData.title || !formData.clientName || !formData.address || !estimatedHours || !hourlyRate) {
       toast({
         title: "Błąd",
@@ -187,7 +187,7 @@ export default function Jobs() {
     loadJobs();
     setIsDialogOpen(false);
     resetForm();
-    
+
     toast({
       title: editingJob ? "Zlecenie zaktualizowane" : "Zlecenie utworzone",
       description: `Zlecenie "${jobData.title}" zostało ${editingJob ? 'zaktualizowane' : 'utworzone'}.`
@@ -318,7 +318,6 @@ export default function Jobs() {
   return (
     <div className="min-h-screen mesh-bg pb-safe">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
-        {/* Header with Enhanced Styling */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 gap-4 animate-slide-up-fade">
           <div>
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-hero bg-clip-text text-transparent font-poppins mb-2">Zlecenia</h1>
@@ -578,7 +577,6 @@ export default function Jobs() {
           </Dialog>
         </div>
 
-        {/* Filters with Glass Effect */}
         <Card className="mb-6 md:mb-8 glass-premium border-none shadow-medium">
           <CardContent className="p-4 sm:p-6">
             <div className="flex flex-col gap-4">
@@ -678,7 +676,6 @@ export default function Jobs() {
           </CardContent>
         </Card>
 
-        {/* Enhanced Jobs List */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
           {isLoading ? (
             Array.from({ length: 8 }).map((_, i) => (
@@ -686,161 +683,160 @@ export default function Jobs() {
                 key={i}
                 className="glass-premium border-none shadow-medium rounded-lg overflow-hidden min-h-[200px]"
               >
-                <Skeleton className="h-1.5 w-full glass-subtle animate-shimmer" /> {/* status bar */}
+                <Skeleton className="h-1.5 w-full glass-subtle animate-shimmer" />
                 <CardHeader className="pb-3 p-5 md:p-6">
                   <div className="space-y-2">
-                    <Skeleton className="h-5 w-full animate-shimmer rounded" /> {/* title */}
+                    <Skeleton className="h-5 w-full animate-shimmer rounded" />
                     <div className="flex gap-2">
-                      <Skeleton className="h-5 w-20 rounded-md animate-shimmer" /> {/* status badge */}
-                      <Skeleton className="h-5 w-16 rounded-md animate-shimmer" /> {/* priority badge */}
+                      <Skeleton className="h-5 w-20 rounded-md animate-shimmer" />
+                      <Skeleton className="h-5 w-16 rounded-md animate-shimmer" />
                     </div>
                   </div>
                 </CardHeader>
                 <CardContent className="p-5 md:p-6 space-y-3">
-                  <Skeleton className="h-4 w-3/4 animate-shimmer rounded" /> {/* client */}
-                  <Skeleton className="h-4 w-full animate-shimmer rounded" /> {/* description */}
+                  <Skeleton className="h-4 w-3/4 animate-shimmer rounded" />
+                  <Skeleton className="h-4 w-full animate-shimmer rounded" />
                   <div className="flex justify-between pt-3 border-t border-primary/10">
-                    <Skeleton className="h-4 w-24 animate-shimmer rounded" /> {/* hours rate */}
-                    <Skeleton className="h-6 w-20 animate-shimmer rounded-lg" /> {/* cost */}
+                    <Skeleton className="h-4 w-24 animate-shimmer rounded" />
+                    <Skeleton className="h-6 w-20 animate-shimmer rounded-lg" />
                   </div>
                 </CardContent>
               </Card>
             ))
           ) : (
-            <Card 
-              key={job.id} 
-              data-tour={index === 0 ? 'job-card' : undefined} 
-              className="glass-premium border-none shadow-medium hover-lift hover-glow transition-glass group overflow-hidden animate-slide-up-fade"
-              style={{ animationDelay: `${index * 50}ms` }}
-            >
-              {/* Status Indicator Bar */}
-              <div className={`h-1.5 w-full ${
-                job.status === 'completed' ? 'bg-success' :
-                job.status === 'in-progress' ? 'bg-info' :
-                job.status === 'pending' ? 'bg-warning' :
-                'bg-destructive'
-              }`} />
-              
-              <CardHeader className="pb-3 p-5 md:p-6">
-                <div className="flex justify-between items-start gap-2">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-2">
-                      {getPriorityIcon(job.priority)}
-                      <CardTitle className="text-base sm:text-lg font-poppins group-hover:text-primary transition-colors truncate">{job.title}</CardTitle>
+            filteredJobs.map((job, index) => (
+              <Card 
+                key={job.id} 
+                data-tour={index === 0 ? 'job-card' : undefined} 
+                className="glass-premium border-none shadow-medium hover-lift hover-glow transition-glass group overflow-hidden animate-slide-up-fade"
+                style={{ animationDelay: `${index * 50}ms` }}
+              >
+                <div className={`h-1.5 w-full ${
+                  job.status === 'completed' ? 'bg-success' :
+                  job.status === 'in-progress' ? 'bg-info' :
+                  job.status === 'pending' ? 'bg-warning' :
+                  'bg-destructive'
+                }`} />
+                
+                <CardHeader className="pb-3 p-5 md:p-6">
+                  <div className="flex justify-between items-start gap-2">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-2">
+                        {getPriorityIcon(job.priority)}
+                        <CardTitle className="text-base sm:text-lg font-poppins group-hover:text-primary transition-colors truncate">{job.title}</CardTitle>
+                      </div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <Badge variant={getStatusBadgeVariant(job.status)} className="flex items-center gap-1 text-xs">
+                          {getStatusIcon(job.status)}
+                          {getStatusText(job.status)}
+                        </Badge>
+                        {job.priority && job.priority !== 'medium' && (
+                          <Badge variant="outline" className="text-xs">
+                            {getPriorityText(job.priority)}
+                          </Badge>
+                        )}
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <Badge variant={getStatusBadgeVariant(job.status)} className="flex items-center gap-1 text-xs">
-                        {getStatusIcon(job.status)}
-                        {getStatusText(job.status)}
-                      </Badge>
-                      {job.priority && job.priority !== 'medium' && (
-                        <Badge variant="outline" className="text-xs">
-                          {getPriorityText(job.priority)}
+                    <div className="flex gap-1 flex-shrink-0">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleEdit(job)}
+                        className="h-8 w-8 p-0 glass-subtle hover-glow active-press"
+                      >
+                        <Edit className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDelete(job)}
+                        className="h-8 w-8 p-0 glass-subtle hover-glow active-press"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-3 p-5 md:p-6 pt-0">
+                  <div>
+                    <p className="text-sm text-foreground font-semibold font-inter">{job.clientName}</p>
+                    <p className="text-sm text-muted-foreground line-clamp-1">{job.address}</p>
+                  </div>
+                  
+                  {job.description && (
+                    <p className="text-sm text-muted-foreground line-clamp-2">
+                      {job.description}
+                    </p>
+                  )}
+
+                  {job.tags && job.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1">
+                      {job.tags.map((tag, idx) => (
+                        <Badge key={idx} variant="secondary" className="text-xs">
+                          <Tag className="h-3 w-3 mr-1" />
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="flex justify-between items-end pt-3 border-t border-primary/10">
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-1 font-inter">
+                        {job.estimatedHours}h × {job.hourlyRate} zł/h
+                      </p>
+                      {job.category && (
+                        <Badge variant="outline" className="text-xs glass-subtle">
+                          {job.category}
                         </Badge>
                       )}
                     </div>
+                    <div className="text-right">
+                      <p className="text-xs text-muted-foreground font-inter">Wartość</p>
+                      <p className="text-lg md:text-xl font-bold bg-gradient-primary bg-clip-text text-transparent font-poppins">
+                        {job.totalCost.toLocaleString('pl-PL')} zł
+                      </p>
+                    </div>
                   </div>
-                  <div className="flex gap-1 flex-shrink-0">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleEdit(job)}
-                      className="h-8 w-8 p-0 glass-subtle hover-glow active-press"
-                    >
-                      <Edit className="h-3.5 w-3.5" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDelete(job)}
-                      className="h-8 w-8 p-0 glass-subtle hover-glow active-press"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </Button>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-3 p-5 md:p-6 pt-0">
-                <div>
-                  <p className="text-sm text-foreground font-semibold font-inter">{job.clientName}</p>
-                  <p className="text-sm text-muted-foreground line-clamp-1">{job.address}</p>
-                </div>
-                
-                {job.description && (
-                  <p className="text-sm text-muted-foreground line-clamp-2">
-                    {job.description}
-                  </p>
-                )}
 
-                {job.tags && job.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-1">
-                    {job.tags.map((tag, idx) => (
-                      <Badge key={idx} variant="secondary" className="text-xs">
-                        <Tag className="h-3 w-3 mr-1" />
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
-                )}
+                  {job.status !== 'completed' && job.status !== 'cancelled' && (
+                    <div className="flex gap-2 pt-2">
+                      {job.status === 'pending' && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="flex-1 text-xs glass-card border-primary/30 hover-glow active-press"
+                          onClick={() => handleQuickStatusChange(job, 'in-progress')}
+                        >
+                          <Activity className="h-3 w-3 mr-1" />
+                          Rozpocznij
+                        </Button>
+                      )}
+                      {job.status === 'in-progress' && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="flex-1 text-xs glass-card border-primary/30 hover-glow active-press"
+                          onClick={() => handleQuickStatusChange(job, 'completed')}
+                        >
+                          <CheckCircle className="h-3 w-3 mr-1" />
+                          Zakończ
+                        </Button>
+                      )}
+                    </div>
+                  )}
 
-                <div className="flex justify-between items-end pt-3 border-t border-primary/10">
-                  <div>
-                    <p className="text-xs text-muted-foreground mb-1 font-inter">
-                      {job.estimatedHours}h × {job.hourlyRate} zł/h
-                    </p>
-                    {job.category && (
-                      <Badge variant="outline" className="text-xs glass-subtle">
-                        {job.category}
-                      </Badge>
-                    )}
-                  </div>
-                  <div className="text-right">
-                    <p className="text-xs text-muted-foreground font-inter">Wartość</p>
-                    <p className="text-lg md:text-xl font-bold bg-gradient-primary bg-clip-text text-transparent font-poppins">
-                      {job.totalCost.toLocaleString('pl-PL')} zł
-                    </p>
-                  </div>
-                </div>
-
-                {job.status !== 'completed' && job.status !== 'cancelled' && (
-                  <div className="flex gap-2 pt-2">
-                    {job.status === 'pending' && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="flex-1 text-xs glass-card border-primary/30 hover-glow active-press"
-                        onClick={() => handleQuickStatusChange(job, 'in-progress')}
-                      >
-                        <Activity className="h-3 w-3 mr-1" />
-                        Rozpocznij
-                      </Button>
-                    )}
-                    {job.status === 'in-progress' && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="flex-1 text-xs glass-card border-primary/30 hover-glow active-press"
-                        onClick={() => handleQuickStatusChange(job, 'completed')}
-                      >
-                        <CheckCircle className="h-3 w-3 mr-1" />
-                        Zakończ
-                      </Button>
-                    )}
-                  </div>
-                )}
-
-                {job.notes && (
-                  <div className="pt-2 border-t">
-                    <p className="text-xs text-muted-foreground line-clamp-2">
-                      💡 {job.notes}
-                    </p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-            filteredJobs.map((job, index) => (
-
-          ))}
+                  {job.notes && (
+                    <div className="pt-2 border-t">
+                      <p className="text-xs text-muted-foreground line-clamp-2">
+                        💡 {job.notes}
+                      </p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ))
+          )}
         </div>
 
         {(!isLoading && filteredJobs.length === 0) && (
