@@ -8,7 +8,7 @@ export default defineConfig(({ mode }) => ({
   // Base URL dla GitHub Pages - zmień na '/' dla innych hostingów
   base: process.env.GITHUB_PAGES === 'true' ? '/fachowiec-pwa/' : '/',
   server: {
-    host: "::",
+    host: "127.0.0.1",
     port: 8080,
   },
   plugins: [
