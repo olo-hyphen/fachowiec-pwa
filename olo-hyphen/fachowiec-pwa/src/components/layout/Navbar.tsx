@@ -66,7 +66,7 @@ export default function Navbar() {
   return (
     <>
       {/* Desktop Navbar */}
-      <nav className="hidden md:flex glass-premium border-none shadow-strong sticky top-0 z-50 backdrop-blur-3xl">
+      <nav role="navigation" aria-label="Główna nawigacja" className="hidden md:flex glass-premium border-none shadow-strong sticky top-0 z-50 backdrop-blur-3xl">
         <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
             <div className="flex items-center">

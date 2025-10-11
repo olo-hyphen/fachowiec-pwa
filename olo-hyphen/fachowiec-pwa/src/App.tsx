@@ -43,7 +43,8 @@ function AppContent() {
     <div className="min-h-screen bg-background transition-colors duration-300">
       <Navbar />
         <Breadcrumbs />
-      <main className="pb-20 md:pb-0">
+      <a href="#main-content" className="sr-only focus:not-sr-only bg-background p-2 rounded z-50 fixed top-4 left-4">Przejdź do treści głównej</a>
+        <main id="main-content" className="pb-20 md:pb-0">
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/jobs" element={<Jobs />} />

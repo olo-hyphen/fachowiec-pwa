@@ -61,6 +61,27 @@ export function useKeyboardShortcuts() {
         toast({ title: "Przejście do Kosztorysów" });
       }
 
+      // Ctrl/Cmd + L - Calendar
+      if (modifier && e.key === 'l') {
+        e.preventDefault();
+        navigate('/calendar');
+        toast({ title: "Przejście do Kalendarza" });
+      }
+
+      // Ctrl/Cmd + R - Reports
+      if (modifier && e.key === 'r') {
+        e.preventDefault();
+        navigate('/reports');
+        toast({ title: "Przejście do Raportów" });
+      }
+
+      // Ctrl/Cmd + , - Settings
+      if (modifier && e.key === ',') {
+        e.preventDefault();
+        navigate('/settings');
+        toast({ title: "Przejście do Ustawień" });
+      }
+
       // ? - Show shortcuts help
       if (e.key === '?' && !modifier) {
         e.preventDefault();

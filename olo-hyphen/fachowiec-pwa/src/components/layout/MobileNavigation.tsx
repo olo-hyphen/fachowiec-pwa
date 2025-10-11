@@ -6,13 +6,17 @@ import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { useSwipeGesture } from "@/hooks/useSwipeGesture";
 import { Vibration } from "@/lib/vibration";
 import { cn } from "@/lib/utils";
+import { MoreSheet } from "@/components/navigation/MoreSheet";
+import { MoreHorizontal } from "lucide-react";
+import { PWAStatus } from "@/components/PWAStatus";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: Home, dataTour: 'dashboard-link' },
   { name: "Zlecenia", href: "/jobs", icon: Briefcase, dataTour: 'jobs-link' },
   { name: "Klienci", href: "/clients", icon: Users, dataTour: 'clients-link' },
-  { name: "Kosztorysy", href: "/estimates", icon: FileText, dataTour: 'estimates-link' },
-  { name: "Kalendarz", href: "/calendar", icon: Calendar, dataTour: 'calendar-link' },
+  { name: "Czas pracy", href: "/time-tracking", icon: Clock, dataTour: 'time-tracking-link' },
+  { name: "Zdjęcia", href: "/photos", icon: Camera, dataTour: 'photos-link' },
+  { name: "Więcej", href: "#", icon: MoreHorizontal, dataTour: 'more-menu' },
 ];
 
 /**
@@ -71,25 +75,31 @@ export default function MobileNavigation() {
             <div className="w-12 h-1 rounded-full bg-muted-foreground/30" />
           </div>
           
-          <nav className="flex items-center justify-around px-2 pb-3 pb-safe">
-            {navigation.map((item, index) => (
-              <NavLink
-                key={item.name}
-                to={item.href}
-                data-tour={item.dataTour}
-                onClick={handleNavClick}
-                className={({ isActive }) =>
-                  cn(
-                    "flex flex-col items-center space-y-1 px-3 py-2.5 rounded-2xl min-w-[44px] min-h-[44px]",
-                    "transition-all duration-300 active-press",
-                    "animate-slide-up-fade",
-                    isActive
-                      ? "bg-gradient-primary text-primary-foreground shadow-glow scale-105"
-                      : "text-muted-foreground hover:text-foreground hover:bg-primary/5"
-                  )
+          <nav role="navigation" aria-label="Główna nawigacja dolna" className="flex items-center justify-around px-2 pb-3 pb-safe">
+            {navigation.map((item, index) => {
+                if (item.name === 'Więcej') {
+                  return (
+                    <MoreSheet key={item.name} data-tour={item.dataTour} style={{ animationDelay: `${index * 50}ms` }} />
+                  );
                 }
-                style={{ animationDelay: `${index * 50}ms` }}
-              >
+                return (
+                  <NavLink
+                    key={item.name}
+                    to={item.href}
+                    data-tour={item.dataTour}
+                    onClick={handleNavClick}
+                    className={({ isActive }) =>
+                      cn(
+                        "flex flex-col items-center space-y-1 px-3 py-2.5 rounded-2xl min-w-[44px] min-h-[44px]",
+                        "transition-all duration-300 active-press",
+                        "animate-slide-up-fade",
+                        isActive
+                          ? "bg-gradient-primary text-primary-foreground shadow-glow scale-105 aria-current='page'"
+                          : "text-muted-foreground hover:text-foreground hover:bg-primary/5"
+                      )
+                    }
+                    style={{ animationDelay: `${index * 50}ms` }}
+                  >
                 <item.icon className="h-5 w-5 transition-transform group-hover:scale-110" />
                 <span className="text-[10px] font-medium">{item.name}</span>
               </NavLink>
