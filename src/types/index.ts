@@ -21,6 +21,7 @@ export interface Job {
   updatedAt: string;
   completedAt?: string;
   category?: string;
+  scheduled_date?: string;
   tags?: string[];
   notes?: string;
 }
