@@ -10,7 +10,8 @@ import {
   Calendar as CalendarIcon,
   BarChart3,
   Menu,
-  LogOut
+  LogOut,
+  Settings
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -27,6 +28,7 @@ const navigation = [
   { name: 'Czas pracy', href: '/time-tracking', icon: Clock },
   { name: 'Zdjęcia', href: '/photos', icon: Camera },
   { name: 'Raporty', href: '/reports', icon: BarChart3 },
+  { name: 'Ustawienia', href: '/settings', icon: Settings },
 ];
 
 export default function Navbar() {

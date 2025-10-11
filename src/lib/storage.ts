@@ -5,6 +5,20 @@ export interface User {
   created_at: string;
 }
 
+interface NotificationSettings {
+  enabled: boolean;
+  timing: 'same-day' | 'day-before' | '2-days-before' | 'week-before';
+  timingHour: number;
+  priorityFilter: 'all' | 'high-urgent' | 'urgent-only';
+  inAppEnabled: boolean;
+}
+
+interface SentNotification {
+  jobId: string;
+  sentAt: string;
+  timing: string;
+}
+
 const DEMO_USER_KEY = 'fachowiec_user';
 
 function getOrCreateDemoUser(): User {
@@ -29,6 +43,9 @@ const STORAGE_KEYS = {
   CLIENTS: 'fachowiec_clients',
   ESTIMATES: 'fachowiec_estimates',
 };
+
+const NOTIFICATION_SETTINGS_KEY = 'fachowiec_notification_settings_demo-user';
+const SENT_NOTIFICATIONS_KEY = 'fachowiec_notifications_sent_demo-user';
 
 function generateId(): string {
   return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -214,6 +231,44 @@ export async function deleteEstimate(estimateId: string) {
   const filteredEstimates = estimates.filter((e: any) => e.id !== estimateId);
 
   saveUserData(STORAGE_KEYS.ESTIMATES, filteredEstimates);
+}
+
+export function getNotificationSettings(): NotificationSettings {
+  const data = localStorage.getItem(NOTIFICATION_SETTINGS_KEY);
+  if (!data) {
+    const defaultSettings: NotificationSettings = {
+      enabled: false,
+      timing: 'same-day',
+      timingHour: 8,
+      priorityFilter: 'all',
+      inAppEnabled: true,
+    };
+    saveNotificationSettings(defaultSettings);
+    return defaultSettings;
+  }
+  return JSON.parse(data) as NotificationSettings;
+}
+
+export function saveNotificationSettings(settings: NotificationSettings): void {
+  localStorage.setItem(NOTIFICATION_SETTINGS_KEY, JSON.stringify(settings));
+}
+
+export function getSentNotifications(): SentNotification[] {
+  const data = localStorage.getItem(SENT_NOTIFICATIONS_KEY);
+  return data ? JSON.parse(data) : [];
+}
+
+export function addSentNotification(sent: SentNotification): void {
+  const sents = getSentNotifications();
+  sents.push(sent);
+  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+  const filtered = sents.filter(s => new Date(s.sentAt) > thirtyDaysAgo);
+  localStorage.setItem(SENT_NOTIFICATIONS_KEY, JSON.stringify(filtered));
+}
+
+export function wasNotified(jobId: string): boolean {
+  const sents = getSentNotifications();
+  return sents.some(s => s.jobId === jobId);
 }
 
 export function initializeSampleData(): void {
