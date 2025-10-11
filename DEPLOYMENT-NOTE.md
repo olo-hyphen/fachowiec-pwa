@@ -1,0 +1,1 @@
+# Deployment Trigger Note\n\nThis file is added to create a commit for the PR that triggers the GitHub Pages deployment workflow.\n\n- Version: 0.0.1\n- Purpose: Trigger build and deploy on merge to main.\n\nNo functional changes to the application.
