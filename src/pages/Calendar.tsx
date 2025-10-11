@@ -126,7 +126,7 @@ export default function Calendar() {
                 </div>
               ))}
             </div>
-            <div className="grid grid-cols-7 gap-2">
+            <div data-tour="calendar-view" className="grid grid-cols-7 gap-2">
               {Array.from({ length: (startOfMonth(currentDate).getDay() + 6) % 7 }).map((_, i) => (
                 <div key={`empty-${i}`} className="aspect-square" />
               ))}

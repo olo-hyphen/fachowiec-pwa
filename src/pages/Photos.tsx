@@ -204,7 +204,8 @@ export default function Photos() {
           
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button 
+              <Button
+                data-tour="photo-upload"
                 onClick={resetForm}
                 className="bg-gradient-primary hover:bg-gradient-primary/90 shadow-soft"
               >
@@ -302,7 +303,7 @@ export default function Photos() {
         </div>
 
         {/* Filters */}
-        <Card className="mb-6 shadow-soft">
+        <Card data-tour="photo-filters" className="mb-6 shadow-soft">
           <CardContent className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>

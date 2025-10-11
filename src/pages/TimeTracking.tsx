@@ -165,7 +165,7 @@ export default function TimeTracking() {
         </div>
 
         {/* Timer Section */}
-        <Card className="mb-8 shadow-soft">
+        <Card data-tour="timer" className="mb-8 shadow-soft">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Clock className="h-5 w-5" />
@@ -296,7 +296,7 @@ export default function TimeTracking() {
         </div>
 
         {/* Recent Time Entries */}
-        <Card className="shadow-soft">
+        <Card data-tour="time-entries" className="shadow-soft">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Calendar className="h-5 w-5" />

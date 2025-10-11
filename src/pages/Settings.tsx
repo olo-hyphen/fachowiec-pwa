@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Settings, Bell, Clock, Filter, AlertCircle, CheckCircle, XCircle } from 'lucide-react';
+import { Settings, Bell, Clock, Filter, AlertCircle, CheckCircle, XCircle, Play } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -133,6 +133,27 @@ const SettingsPage = () => {
               </>
             )}
           </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Tour aplikacji</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground mb-4">
+            Zobacz ponownie tour wprowadzający
+          </p>
+          <Button
+            variant="outline"
+            onClick={() => {
+              localStorage.removeItem('fachowiec_tour_completed');
+              window.location.reload();
+            }}
+          >
+            <Play className="mr-2 h-4 w-4" />
+            Uruchom tour ponownie
+          </Button>
         </CardContent>
       </Card>
 
