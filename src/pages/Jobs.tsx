@@ -7,6 +7,8 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { getJobs, saveJob, deleteJob } from '@/lib/storage';
 import { Job, JobStatus, JobPriority } from '@/types';
 import { 
@@ -20,10 +22,13 @@ import {
   Activity,
   ArrowUpDown,
   Flag,
-  Calendar,
-  Tag
+  Calendar as CalendarIcon,
+  Tag,
+  X
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { format } from 'date-fns';
+import { pl } from 'date-fns/locale';
 
 export default function Jobs() {
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -34,6 +39,8 @@ export default function Jobs() {
   const [sortBy, setSortBy] = useState<string>('date-desc');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingJob, setEditingJob] = useState<Job | null>(null);
+  const [scheduledDate, setScheduledDate] = useState<Date | undefined>(undefined);
+  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const { toast } = useToast();
 
   const [formData, setFormData] = useState({
@@ -43,6 +50,7 @@ export default function Jobs() {
     clientPhone: '',
     clientEmail: '',
     address: '',
+    scheduled_date: '',
     estimatedHours: '',
     hourlyRate: '',
     category: '',
@@ -117,6 +125,7 @@ export default function Jobs() {
       clientPhone: '',
       clientEmail: '',
       address: '',
+      scheduled_date: '',
       estimatedHours: '',
       hourlyRate: '',
       category: '',
@@ -125,6 +134,8 @@ export default function Jobs() {
       tags: '',
       notes: ''
     });
+    setScheduledDate(undefined);
+    setIsDatePickerOpen(false);
     setEditingJob(null);
   };
 
@@ -157,6 +168,7 @@ export default function Jobs() {
       status: formData.status,
       priority: formData.priority,
       category: formData.category,
+      scheduled_date: formData.scheduled_date || undefined,
       tags: formData.tags ? formData.tags.split(',').map(t => t.trim()).filter(Boolean) : [],
       notes: formData.notes,
       createdAt: editingJob?.createdAt || new Date().toISOString(),
@@ -179,6 +191,7 @@ export default function Jobs() {
 
   const handleEdit = (job: Job) => {
     setEditingJob(job);
+    const existingDate = job.scheduled_date ? new Date(job.scheduled_date) : undefined;
     setFormData({
       title: job.title,
       description: job.description,
@@ -186,6 +199,7 @@ export default function Jobs() {
       clientPhone: job.clientPhone || '',
       clientEmail: job.clientEmail || '',
       address: job.address,
+      scheduled_date: job.scheduled_date || '',
       estimatedHours: job.estimatedHours.toString(),
       hourlyRate: job.hourlyRate.toString(),
       category: job.category || '',
@@ -194,6 +208,8 @@ export default function Jobs() {
       tags: job.tags?.join(', ') || '',
       notes: job.notes || ''
     });
+    setScheduledDate(existingDate && !Number.isNaN(existingDate.getTime()) ? existingDate : undefined);
+    setIsDatePickerOpen(false);
     setIsDialogOpen(true);
   };
 
@@ -431,6 +447,58 @@ export default function Jobs() {
                     onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                     placeholder="ul. Przykładowa 15, Warszawa"
                   />
+                </div>
+
+                <div>
+                  <Label>Data planowana</Label>
+                  <div className="mt-2 flex flex-wrap items-center gap-2">
+                    <Popover open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
+                      <PopoverTrigger asChild>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className={`w-full sm:flex-1 justify-start text-left font-normal ${!scheduledDate ? 'text-muted-foreground' : ''}`}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {scheduledDate ? format(scheduledDate, 'PPP', { locale: pl }) : 'Wybierz datę'}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <CalendarComponent
+                          mode="single"
+                          selected={scheduledDate}
+                          onSelect={(date) => {
+                            setScheduledDate(date ?? undefined);
+                            setFormData((prev) => ({
+                              ...prev,
+                              scheduled_date: date ? date.toISOString().split('T')[0] : ''
+                            }));
+                            if (date) {
+                              setIsDatePickerOpen(false);
+                            }
+                          }}
+                          locale={pl}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    {scheduledDate && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => {
+                          setScheduledDate(undefined);
+                          setFormData((prev) => ({ ...prev, scheduled_date: '' }));
+                          setIsDatePickerOpen(false);
+                        }}
+                        aria-label="Wyczyść datę planowaną"
+                        className="h-10 w-10"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
