@@ -65,7 +65,7 @@ export default function Dashboard() {
         .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
         .slice(0, 5);
       setRecentJobs(sortedJobs as any);
-      setIsLoading(false);    };
+      setIsLoading(false);
     };
     
     fetchData();
@@ -143,6 +143,61 @@ export default function Dashboard() {
               </div>
             ))
           ) : (
+            <>
+              <div className="animate-slide-up-fade delay-100">
+                <StatCard
+                  title="Zakończone zlecenia"
+                  value={kpi.completedJobs}
+                  change={{ value: 12, label: 'w tym miesiącu' }}
+                  icon={CheckCircle}
+                  variant="premium"
+                />
+              </div>
+              <div className="animate-slide-up-fade delay-200">
+                <StatCard
+                  title="Łączne przychody"
+                  value={`${kpi.totalRevenue.toLocaleString('pl-PL')} zł`}
+                  change={{ value: 8, label: 'vs poprzedni miesiąc' }}
+                  icon={Euro}
+                  variant="elevated"
+                />
+              </div>
+              <div className="animate-slide-up-fade delay-300">
+                <StatCard
+                  title="Średni czas zlecenia"
+                  value={`${kpi.averageJobDuration}h`}
+                  change={{ value: -5, label: 'efektywność' }}
+                  icon={Clock}
+                  variant="default"
+                />
+              </div>
+              <div className="animate-slide-up-fade delay-400">
+                <StatCard
+                  title="Średnia ocena"
+                  value={kpi.averageRating}
+                  change={{ value: 2, label: 'zadowolenie klientów' }}
+                  icon={Star}
+                  variant="default"
+                />
+              </div>
+              <div className="animate-slide-up-fade delay-500">
+                <StatCard
+                  title="Aktywne zlecenia"
+                  value={kpi.activeJobs}
+                  icon={Activity}
+                  variant="elevated"
+                />
+              </div>
+              <div className="animate-slide-up-fade delay-600">
+                <StatCard
+                  title="Marża zysku"
+                  value={`${kpi.profitMargin}%`}
+                  change={{ value: 3, label: 'rentowność' }}
+                  icon={TrendingUp}
+                  variant="default"
+                />
+              </div>
+            </>
           <div className="animate-slide-up-fade delay-100">
             <StatCard
               title="Zakończone zlecenia"

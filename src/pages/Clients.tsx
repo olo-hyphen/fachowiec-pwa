@@ -44,9 +44,15 @@ export default function Clients() {
     try {
       const data = await getClients();
       setClients(data);
-      setIsLoading(false);    } catch (error) {
+      setIsLoading(false);
     } catch (error) {
       toast({
+        title: "Error",
+        description: "Failed to load clients",
+        variant: "destructive"
+      });
+      setIsLoading(false);
+    }
         title: "Error",
         description: "Failed to load clients",
         variant: "destructive"
@@ -238,62 +244,63 @@ export default function Clients() {
               </Card>
             ))
           ) : (
-            <Card key={client.id} className="glass-effect hover-scale">
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <CardTitle className="text-lg">{client.name}</CardTitle>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => openEditDialog(client)}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleDelete(client.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-                {client.rating && (
-                  <div data-tour={index === 0 ? 'client-rating' : undefined} className="flex gap-1">
-                    {Array.from({ length: client.rating }).map((_, i) => (
-                      <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    ))}
-                  </div>
-                )}
-              </CardHeader>
-              <CardContent className="space-y-2">
-                {client.email && (
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Mail className="h-4 w-4" />
-                    <span className="truncate">{client.email}</span>
-                  </div>
-                )}
-                {client.phone && (
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Phone className="h-4 w-4" />
-                    <span>{client.phone}</span>
-                  </div>
-                )}
-                {client.address && (
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <MapPin className="h-4 w-4" />
-                    <span className="line-clamp-2">{client.address}</span>
-                  </div>
-                )}
-                {client.notes && (
-                  <p className="text-sm text-muted-foreground line-clamp-2 mt-2">
-                    {client.notes}
-                  </p>
-                )}
-              </CardContent>
-            </Card>
             clients.map((client, index) => (
+              <Card key={client.id} className="glass-effect hover-scale">
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <CardTitle className="text-lg">{client.name}</CardTitle>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => openEditDialog(client)}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleDelete(client.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                  {client.rating && (
+                    <div data-tour={index === 0 ? 'client-rating' : undefined} className="flex gap-1">
+                      {Array.from({ length: client.rating }).map((_, i) => (
+                        <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                      ))}
+                    </div>
+                  )}
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  {client.email && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Mail className="h-4 w-4" />
+                      <span className="truncate">{client.email}</span>
+                    </div>
+                  )}
+                  {client.phone && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Phone className="h-4 w-4" />
+                      <span>{client.phone}</span>
+                    </div>
+                  )}
+                  {client.address && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <MapPin className="h-4 w-4" />
+                      <span className="line-clamp-2">{client.address}</span>
+                    </div>
+                  )}
+                  {client.notes && (
+                    <p className="text-sm text-muted-foreground line-clamp-2 mt-2">
+                      {client.notes}
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+            ))
 
           ))}
         </div>
