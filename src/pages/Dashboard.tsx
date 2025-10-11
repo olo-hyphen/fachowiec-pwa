@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { StatCard } from '@/components/ui/stat-card';
+import { Skeleton } from '@/components/ui/skeleton';
 import { getJobs, getTimeEntries, initializeSampleData } from '@/lib/storage';
 import { Job, TimeEntry, KPI } from '@/types';
 import { 
@@ -32,10 +33,12 @@ export default function Dashboard() {
   });
 
   const [recentJobs, setRecentJobs] = useState<Job[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Calculate KPIs
     const fetchData = async () => {
+      setIsLoading(true);
       const jobs = await getJobs();
       const timeEntries = await getTimeEntries();
       
@@ -62,6 +65,7 @@ export default function Dashboard() {
         .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
         .slice(0, 5);
       setRecentJobs(sortedJobs as any);
+      setIsLoading(false);    };
     };
     
     fetchData();
@@ -101,20 +105,44 @@ export default function Dashboard() {
     <div className="min-h-screen mesh-bg">
       <div className="container mx-auto p-4 md:p-8 space-y-8 md:space-y-10">
         {/* Header with Gradient and Animation */}
-        <div className="space-y-3 animate-slide-up-fade">
-          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-hero bg-clip-text text-transparent font-poppins">
-            Dashboard
-          </h1>
-          <p className="text-muted-foreground font-inter text-sm md:text-base">
-            Przegląd Twojej działalności
-          </p>
-        </div>
+        {isLoading ? (
+          <div className="space-y-3">
+            <Skeleton className="h-12 w-64 rounded-lg glass-subtle animate-shimmer mb-2" />
+            <Skeleton className="h-4 w-48 rounded glass-subtle animate-shimmer" />
+          </div>
+        ) : (
+          <div className="space-y-3 animate-slide-up-fade">
+            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-hero bg-clip-text text-transparent font-poppins">
+              Dashboard
+            </h1>
+            <p className="text-muted-foreground font-inter text-sm md:text-base">
+              Przegląd Twojej działalności
+            </p>
+          </div>
+        )}
 
         {/* KPI Cards with Staggered Animation and Better Spacing */}
         <div 
           data-tour="kpi-cards" 
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"
         >
+          {isLoading ? (
+            Array.from({ length: 6 }).map((_, i) => (
+              <div
+                key={i}
+                className={`glass-subtle rounded-lg p-4 md:p-6 shadow-soft animate-slide-up-fade ${['delay-100', 'delay-200', 'delay-300', 'delay-400', 'delay-500', 'delay-600'][i] || ''}`}
+              >
+                <div className="space-y-3">
+                  <Skeleton className="h-4 w-3/4 animate-shimmer rounded" /> {/* title */}
+                  <Skeleton className="h-10 w-full animate-shimmer rounded-lg" /> {/* value */}
+                  <div className="flex items-center justify-between pt-2">
+                    <Skeleton className="h-6 w-16 animate-shimmer rounded" /> {/* change */}
+                    <Skeleton className="h-6 w-20 rounded-full animate-shimmer" /> {/* badge */}
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
           <div className="animate-slide-up-fade delay-100">
             <StatCard
               title="Zakończone zlecenia"

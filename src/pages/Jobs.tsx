@@ -27,6 +27,7 @@ import {
   X
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
 import { pl } from 'date-fns/locale';
 
@@ -42,6 +43,7 @@ export default function Jobs() {
   const [scheduledDate, setScheduledDate] = useState<Date | undefined>(undefined);
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(true);
 
   const [formData, setFormData] = useState({
     title: '',
@@ -69,8 +71,11 @@ export default function Jobs() {
   }, [jobs, searchTerm, statusFilter, priorityFilter, sortBy]);
 
   const loadJobs = async () => {
+    setIsLoading(true);
     const allJobs = await getJobs();
     setJobs(allJobs as any);
+    setIsLoading(false);
+  };
   };
 
   const filterJobs = () => {
@@ -577,86 +582,131 @@ export default function Jobs() {
         <Card className="mb-6 md:mb-8 glass-premium border-none shadow-medium">
           <CardContent className="p-4 sm:p-6">
             <div className="flex flex-col gap-4">
-              <div className="flex flex-col gap-3">
-                <div className="w-full">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      data-tour="search-input"
-                      placeholder="Szukaj zleceń..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10"
-                    />
+              {isLoading ? (
+                <div className="space-y-4">
+                  <div className="space-y-3">
+                    <Skeleton className="h-10 w-full rounded-lg glass-subtle animate-shimmer" />
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                      {Array.from({ length: 3 }).map((_, i) => (
+                        <Skeleton
+                          key={i}
+                          className="h-10 w-full rounded-lg glass-subtle animate-shimmer"
+                        />
+                      ))}
+                    </div>
                   </div>
+                  <Skeleton className="h-4 w-32 rounded glass-subtle animate-shimmer" />
                 </div>
-                <div data-tour="filters" className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                  <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Wszystkie</SelectItem>
-                      <SelectItem value="pending">Oczekujące</SelectItem>
-                      <SelectItem value="in-progress">W trakcie</SelectItem>
-                      <SelectItem value="completed">Zakończone</SelectItem>
-                      <SelectItem value="cancelled">Anulowane</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Select value={priorityFilter} onValueChange={setPriorityFilter}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Priorytet" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Wszystkie</SelectItem>
-                      <SelectItem value="urgent">Pilne</SelectItem>
-                      <SelectItem value="high">Wysoki</SelectItem>
-                      <SelectItem value="medium">Średni</SelectItem>
-                      <SelectItem value="low">Niski</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Select value={sortBy} onValueChange={setSortBy}>
-                    <SelectTrigger className="w-full">
-                      <ArrowUpDown className="h-4 w-4 mr-2" />
-                      <SelectValue placeholder="Sortuj" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="date-desc">Najnowsze</SelectItem>
-                      <SelectItem value="date-asc">Najstarsze</SelectItem>
-                      <SelectItem value="priority">Priorytet</SelectItem>
-                      <SelectItem value="cost-desc">Wartość: malejąco</SelectItem>
-                      <SelectItem value="cost-asc">Wartość: rosnąco</SelectItem>
-                      <SelectItem value="name">Nazwa A-Z</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                <span className="flex items-center gap-1">
-                  Znaleziono: <span className="font-semibold text-foreground">{filteredJobs.length}</span>
-                </span>
-                {(statusFilter !== 'all' || priorityFilter !== 'all' || searchTerm) && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      setSearchTerm('');
-                      setStatusFilter('all');
-                      setPriorityFilter('all');
-                    }}
-                  >
-                    Wyczyść filtry
-                  </Button>
-                )}
-              </div>
+              ) : (
+                <>
+                  <div className="flex flex-col gap-3">
+                    <div className="w-full">
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          data-tour="search-input"
+                          placeholder="Szukaj zleceń..."
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                          className="pl-10"
+                        />
+                      </div>
+                    </div>
+                    <div data-tour="filters" className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                      <Select value={statusFilter} onValueChange={setStatusFilter}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">Wszystkie</SelectItem>
+                          <SelectItem value="pending">Oczekujące</SelectItem>
+                          <SelectItem value="in-progress">W trakcie</SelectItem>
+                          <SelectItem value="completed">Zakończone</SelectItem>
+                          <SelectItem value="cancelled">Anulowane</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Select value={priorityFilter} onValueChange={setPriorityFilter}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Priorytet" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">Wszystkie</SelectItem>
+                          <SelectItem value="urgent">Pilne</SelectItem>
+                          <SelectItem value="high">Wysoki</SelectItem>
+                          <SelectItem value="medium">Średni</SelectItem>
+                          <SelectItem value="low">Niski</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Select value={sortBy} onValueChange={setSortBy}>
+                        <SelectTrigger className="w-full">
+                          <ArrowUpDown className="h-4 w-4 mr-2" />
+                          <SelectValue placeholder="Sortuj" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="date-desc">Najnowsze</SelectItem>
+                          <SelectItem value="date-asc">Najstarsze</SelectItem>
+                          <SelectItem value="priority">Priorytet</SelectItem>
+                          <SelectItem value="cost-desc">Wartość: malejąco</SelectItem>
+                          <SelectItem value="cost-asc">Wartość: rosnąco</SelectItem>
+                          <SelectItem value="name">Nazwa A-Z</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                    <span className="flex items-center gap-1">
+                      Znaleziono: <span className="font-semibold text-foreground">{filteredJobs.length}</span>
+                    </span>
+                    {(statusFilter !== 'all' || priorityFilter !== 'all' || searchTerm) && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setSearchTerm('');
+                          setStatusFilter('all');
+                          setPriorityFilter('all');
+                        }}
+                      >
+                        Wyczyść filtry
+                      </Button>
+                    )}
+                  </div>
+                </>
+              )}
             </div>
           </CardContent>
         </Card>
 
         {/* Enhanced Jobs List */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-          {filteredJobs.map((job, index) => (
+          {isLoading ? (
+            Array.from({ length: 8 }).map((_, i) => (
+              <Card
+                key={i}
+                className="glass-premium border-none shadow-medium rounded-lg overflow-hidden min-h-[200px]"
+              >
+                <Skeleton className="h-1.5 w-full glass-subtle animate-shimmer" /> {/* status bar */}
+                <CardHeader className="pb-3 p-5 md:p-6">
+                  <div className="space-y-2">
+                    <Skeleton className="h-5 w-full animate-shimmer rounded" /> {/* title */}
+                    <div className="flex gap-2">
+                      <Skeleton className="h-5 w-20 rounded-md animate-shimmer" /> {/* status badge */}
+                      <Skeleton className="h-5 w-16 rounded-md animate-shimmer" /> {/* priority badge */}
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-5 md:p-6 space-y-3">
+                  <Skeleton className="h-4 w-3/4 animate-shimmer rounded" /> {/* client */}
+                  <Skeleton className="h-4 w-full animate-shimmer rounded" /> {/* description */}
+                  <div className="flex justify-between pt-3 border-t border-primary/10">
+                    <Skeleton className="h-4 w-24 animate-shimmer rounded" /> {/* hours rate */}
+                    <Skeleton className="h-6 w-20 animate-shimmer rounded-lg" /> {/* cost */}
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          ) : (
             <Card 
               key={job.id} 
               data-tour={index === 0 ? 'job-card' : undefined} 
@@ -788,10 +838,12 @@ export default function Jobs() {
                 )}
               </CardContent>
             </Card>
+            filteredJobs.map((job, index) => (
+
           ))}
         </div>
 
-        {filteredJobs.length === 0 && (
+        {(!isLoading && filteredJobs.length === 0) && (
           <Card className="glass-premium border-none shadow-medium">
             <CardContent className="p-12 md:p-16 text-center">
               <h3 className="text-lg font-medium text-muted-foreground mb-2">

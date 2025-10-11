@@ -368,6 +368,13 @@ All colors MUST be HSL.
     animation: shimmer 2s infinite;
   }
 
+  .dark .animate-shimmer {
+    background: linear-gradient(90deg, 
+      transparent, 
+      rgba(255, 255, 255, 0.15), 
+      transparent);
+  }
+
   .animate-slide-up-fade {
     animation: slide-up-fade 0.5s ease-out forwards;
   }

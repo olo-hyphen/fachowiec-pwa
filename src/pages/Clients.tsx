@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Plus, Mail, Phone, MapPin, Star, Trash2, Edit } from "lucide-react";
 
 interface Client {
@@ -24,6 +25,7 @@ export default function Clients() {
   const [clients, setClients] = useState<Client[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -38,9 +40,11 @@ export default function Clients() {
   }, []);
 
   const fetchClients = async () => {
+    setIsLoading(true);
     try {
       const data = await getClients();
       setClients(data);
+      setIsLoading(false);    } catch (error) {
     } catch (error) {
       toast({
         title: "Error",
@@ -208,7 +212,32 @@ export default function Clients() {
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {clients.map((client, index) => (
+          {isLoading ? (
+            Array.from({ length: 6 }).map((_, i) => (
+              <Card key={i} className="glass-subtle rounded-lg shadow-soft min-h-[200px]">
+                <CardHeader>
+                  <div className="flex justify-between items-start">
+                    <Skeleton className="h-5 w-48 animate-shimmer rounded" />
+                    <div className="flex gap-2">
+                      <Skeleton className="h-8 w-8 rounded animate-shimmer" />
+                      <Skeleton className="h-8 w-8 rounded animate-shimmer" />
+                    </div>
+                  </div>
+                  <div className="flex gap-1 mt-2">
+                    {Array.from({ length: 5 }).map((_, j) => (
+                      <Skeleton key={j} className="h-4 w-4 rounded-full animate-shimmer" />
+                    ))}
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-2 pt-0">
+                  <Skeleton className="h-4 w-3/4 animate-shimmer rounded" />
+                  <Skeleton className="h-4 w-full animate-shimmer rounded" />
+                  <Skeleton className="h-4 w-2/3 animate-shimmer rounded" />
+                  <Skeleton className="h-4 w-full animate-shimmer rounded" />
+                </CardContent>
+              </Card>
+            ))
+          ) : (
             <Card key={client.id} className="glass-effect hover-scale">
               <CardHeader>
                 <div className="flex items-start justify-between">
@@ -264,10 +293,12 @@ export default function Clients() {
                 )}
               </CardContent>
             </Card>
+            clients.map((client, index) => (
+
           ))}
         </div>
 
-        {clients.length === 0 && (
+        {(!isLoading && clients.length === 0) && (
           <Card className="glass-effect">
             <CardContent className="flex flex-col items-center justify-center py-12">
               <p className="text-muted-foreground">Brak klientów. Dodaj pierwszego!</p>
