@@ -324,7 +324,8 @@ export default function Jobs() {
           
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button 
+              <Button
+                data-tour="add-job-button"
                 onClick={resetForm}
                 className="bg-gradient-primary hover:bg-gradient-primary/90 shadow-soft w-full sm:w-auto"
               >
@@ -581,6 +582,7 @@ export default function Jobs() {
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
+                      data-tour="search-input"
                       placeholder="Szukaj zleceń..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
@@ -588,7 +590,7 @@ export default function Jobs() {
                     />
                   </div>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <div data-tour="filters" className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                   <Select value={statusFilter} onValueChange={setStatusFilter}>
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Status" />
@@ -654,8 +656,8 @@ export default function Jobs() {
 
         {/* Jobs List */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          {filteredJobs.map((job) => (
-            <Card key={job.id} className="shadow-soft hover:shadow-medium transition-all hover-scale">
+          {filteredJobs.map((job, index) => (
+            <Card key={job.id} data-tour={index === 0 ? 'job-card' : undefined} className="shadow-soft hover:shadow-medium transition-all hover-scale">
               <CardHeader className="pb-3 p-4 sm:p-6">
                 <div className="flex justify-between items-start gap-2">
                   <div className="flex-1 min-w-0">

@@ -186,7 +186,7 @@ export default function Estimates() {
                 Nowy kosztorys
               </Button>
             </DialogTrigger>
-            <DialogContent className="glass-effect max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogContent data-tour="estimate-calculator" className="glass-effect max-w-4xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Nowy kosztorys</DialogTitle>
               </DialogHeader>

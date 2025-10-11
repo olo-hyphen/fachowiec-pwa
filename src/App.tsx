@@ -20,6 +20,7 @@ import NotFound from "./pages/NotFound";
 import Settings from "./pages/Settings";
 import { useNotifications } from "./hooks/useNotifications";
 import { useEffect } from 'react';
+import OnboardingTour from './components/OnboardingTour';
 
 const queryClient = new QueryClient();
 
@@ -51,6 +52,7 @@ function AppContent() {
         </Routes>
       </main>
       <MobileNavigation />
+      <OnboardingTour />
     </div>
   );
 }

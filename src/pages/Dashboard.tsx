@@ -102,7 +102,7 @@ export default function Dashboard() {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6 animate-fade-in">
+      <div data-tour="kpi-cards" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6 animate-fade-in">
         <div className="animate-bounce-in" style={{animationDelay: '0.1s'}}>
           <StatCard
             title="Zakończone zlecenia"
@@ -153,7 +153,7 @@ export default function Dashboard() {
       </div>
 
       {/* Recent Jobs */}
-      <Card className="glass-card border-none shadow-glass animate-fade-in mt-8">
+      <Card data-tour="recent-jobs" className="glass-card border-none shadow-glass animate-fade-in mt-8">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-lg font-poppins">
             <Briefcase className="h-5 w-5 text-primary" />

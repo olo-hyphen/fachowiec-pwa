@@ -208,7 +208,7 @@ export default function Clients() {
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {clients.map((client) => (
+          {clients.map((client, index) => (
             <Card key={client.id} className="glass-effect hover-scale">
               <CardHeader>
                 <div className="flex items-start justify-between">
@@ -231,7 +231,7 @@ export default function Clients() {
                   </div>
                 </div>
                 {client.rating && (
-                  <div className="flex gap-1">
+                  <div data-tour={index === 0 ? 'client-rating' : undefined} className="flex gap-1">
                     {Array.from({ length: client.rating }).map((_, i) => (
                       <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                     ))}
