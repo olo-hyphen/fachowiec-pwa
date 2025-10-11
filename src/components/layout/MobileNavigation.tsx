@@ -5,11 +5,11 @@ import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 
 const navigation = [
-  { name: "Dashboard", href: "/", icon: Home },
-  { name: "Zlecenia", href: "/jobs", icon: Briefcase },
-  { name: "Klienci", href: "/clients", icon: Users },
-  { name: "Kosztorysy", href: "/estimates", icon: FileText },
-  { name: "Kalendarz", href: "/calendar", icon: Calendar },
+  { name: "Dashboard", href: "/", icon: Home, dataTour: 'dashboard-link' },
+  { name: "Zlecenia", href: "/jobs", icon: Briefcase, dataTour: 'jobs-link' },
+  { name: "Klienci", href: "/clients", icon: Users, dataTour: 'clients-link' },
+  { name: "Kosztorysy", href: "/estimates", icon: FileText, dataTour: 'estimates-link' },
+  { name: "Kalendarz", href: "/calendar", icon: Calendar, dataTour: 'calendar-link' },
   { name: "Ustawienia", href: "/settings", icon: Settings },
 ];
 
@@ -34,6 +34,7 @@ export default function MobileNavigation() {
               <NavLink
                 key={item.name}
                 to={item.href}
+                data-tour={item.dataTour}
                 className={({ isActive }) =>
                   `flex flex-col items-center space-y-1 px-3 py-2.5 rounded-2xl transition-all duration-300 min-w-[44px] min-h-[44px] ${
                     isActive
@@ -46,7 +47,7 @@ export default function MobileNavigation() {
                 <span className="text-[11px] font-medium">{item.name}</span>
               </NavLink>
             ))}
-            <div className="flex flex-col items-center space-y-1 px-2 py-2">
+            <div className="flex flex-col items-center space-y-1 px-2 py-2" data-tour="theme-toggle">
               <ThemeToggle />
             </div>
           </nav>

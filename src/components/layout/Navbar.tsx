@@ -20,13 +20,13 @@ import { KeyboardShortcutsInfo } from '@/components/KeyboardShortcutsInfo';
 import { PWAStatus } from '@/components/PWAStatus';
 
 const navigation = [
-  { name: 'Dashboard', href: '/', icon: Home },
-  { name: 'Zlecenia', href: '/jobs', icon: Briefcase },
-  { name: 'Klienci', href: '/clients', icon: Users },
-  { name: 'Kosztorysy', href: '/estimates', icon: FileText },
-  { name: 'Kalendarz', href: '/calendar', icon: CalendarIcon },
-  { name: 'Czas pracy', href: '/time-tracking', icon: Clock },
-  { name: 'Zdjęcia', href: '/photos', icon: Camera },
+  { name: 'Dashboard', href: '/', icon: Home, dataTour: 'dashboard-link' },
+  { name: 'Zlecenia', href: '/jobs', icon: Briefcase, dataTour: 'jobs-link' },
+  { name: 'Klienci', href: '/clients', icon: Users, dataTour: 'clients-link' },
+  { name: 'Kosztorysy', href: '/estimates', icon: FileText, dataTour: 'estimates-link' },
+  { name: 'Kalendarz', href: '/calendar', icon: CalendarIcon, dataTour: 'calendar-link' },
+  { name: 'Czas pracy', href: '/time-tracking', icon: Clock, dataTour: 'time-tracking-link' },
+  { name: 'Zdjęcia', href: '/photos', icon: Camera, dataTour: 'photos-link' },
   { name: 'Raporty', href: '/reports', icon: BarChart3 },
   { name: 'Ustawienia', href: '/settings', icon: Settings },
 ];
@@ -44,6 +44,7 @@ export default function Navbar() {
           <Link
             key={item.name}
             to={item.href}
+            data-tour={item.dataTour}
             className={cn(
               'flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium transition-all duration-300 hover:scale-105 font-inter',
               isActive
@@ -81,9 +82,15 @@ export default function Navbar() {
             
             <div className="flex items-center space-x-2">
               <NavLinks />
-              <PWAStatus />
-              <KeyboardShortcutsInfo />
-              <ThemeToggle />
+              <div data-tour="pwa-status">
+                <PWAStatus />
+              </div>
+              <div data-tour="keyboard-shortcuts">
+                <KeyboardShortcutsInfo />
+              </div>
+              <div data-tour="theme-toggle">
+                <ThemeToggle />
+              </div>
             </div>
           </div>
         </div>

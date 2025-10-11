@@ -194,32 +194,78 @@ export default function OnboardingTour() {
   ];
 
   const handleJoyrideCallback = (data: CallBackProps) => {
-    const { status, type, index } = data;
+    const { status, type, index, action } = data;
 
     if ([STATUS.FINISHED, STATUS.SKIPPED].includes(status)) {
       localStorage.setItem('fachowiec_tour_completed', 'true');
       setRun(false);
+      return;
     }
 
+    // Handle navigation before showing step
     if (type === EVENTS.STEP_BEFORE) {
-      // Nawiguj przed pokazaniem kroku
-      if (index === 4 && location.pathname !== '/jobs') { // jobs-link step
-        navigate('/jobs');
-      } else if (index === 9 && location.pathname !== '/time-tracking') { // time-tracking-link
-        navigate('/time-tracking');
-      } else if (index === 12 && location.pathname !== '/photos') { // photos-link
-        navigate('/photos');
-      } else if (index === 15 && location.pathname !== '/clients') { // clients-link
-        navigate('/clients');
-      } else if (index === 17 && location.pathname !== '/estimates') { // estimates-link
-        navigate('/estimates');
-      } else if (index === 19 && location.pathname !== '/calendar') { // calendar-link
-        navigate('/calendar');
+      let needsNavigation = false;
+      let targetPath = '';
+
+      // Map step indices to navigation paths  
+      switch (index) {
+        case 4: // jobs-link step
+          if (location.pathname !== '/jobs') {
+            needsNavigation = true;
+            targetPath = '/jobs';
+          }
+          break;
+        case 9: // time-tracking-link step  
+          if (location.pathname !== '/time-tracking') {
+            needsNavigation = true;
+            targetPath = '/time-tracking';
+          }
+          break;
+        case 12: // photos-link step
+          if (location.pathname !== '/photos') {
+            needsNavigation = true;
+            targetPath = '/photos';
+          }
+          break;
+        case 15: // clients-link step
+          if (location.pathname !== '/clients') {
+            needsNavigation = true;
+            targetPath = '/clients';
+          }
+          break;
+        case 17: // estimates-link step
+          if (location.pathname !== '/estimates') {
+            needsNavigation = true;
+            targetPath = '/estimates';
+          }
+          break;
+        case 19: // calendar-link step
+          if (location.pathname !== '/calendar') {
+            needsNavigation = true;
+            targetPath = '/calendar';
+          }
+          break;
+      }
+
+      if (needsNavigation) {
+        navigate(targetPath);
+        // Give time for navigation and DOM to update
+        setTimeout(() => {
+          setStepIndex(index);
+        }, 300);
+        return;
       }
     }
 
-    if (type === EVENTS.STEP_AFTER || type === EVENTS.TARGET_NOT_FOUND) {
-      setStepIndex(index + (type === EVENTS.TARGET_NOT_FOUND ? 1 : 0));
+    // Handle step progression
+    if (type === EVENTS.STEP_AFTER) {
+      setStepIndex(index + 1);
+    }
+
+    // Handle missing targets by skipping to next step
+    if (type === EVENTS.TARGET_NOT_FOUND) {
+      console.warn(`Tour target not found for step ${index}:`, steps[index]?.target);
+      setStepIndex(index + 1);
     }
   };
 
@@ -231,18 +277,35 @@ export default function OnboardingTour() {
       continuous
       showProgress
       showSkipButton
+      hideBackButton={false}
+      disableOverlayClose
+      spotlightClicks
       callback={handleJoyrideCallback}
+      options={{
+        primaryColor: 'hsl(262 83% 58%)',
+        zIndex: 10000,
+        arrowColor: '#fff',
+        backgroundColor: '#fff',
+        overlayColor: 'rgba(0, 0, 0, 0.4)',
+        spotlightShadow: '0 0 15px rgba(0, 0, 0, 0.5)',
+        width: 350,
+      }}
       styles={{
-        options: {
-          primaryColor: 'hsl(262 83% 58%)', // --primary z Tailwind
-          zIndex: 10000,
-        },
         tooltip: {
           borderRadius: 12,
           padding: 20,
         },
         buttonNext: {
           background: 'linear-gradient(135deg, hsl(262 83% 58%), hsl(262 83% 48%))',
+          borderRadius: 8,
+        },
+        buttonBack: {
+          borderRadius: 8,
+        },
+        buttonSkip: {
+          borderRadius: 8,
+        },
+        buttonClose: {
           borderRadius: 8,
         },
       }}
