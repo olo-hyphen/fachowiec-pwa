@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { StatCard } from '@/components/ui/stat-card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { getJobs, getTimeEntries, initializeSampleData } from '@/lib/storage';
-import { Job, TimeEntry, KPI } from '@/types';
+import { getJobs, getTimeEntries } from '@/lib/storage';
+import { Job, KPI } from '@/types';
 import { 
   Briefcase, 
   Euro, 
@@ -17,10 +17,6 @@ import {
   AlertCircle
 } from 'lucide-react';
 
-/**
- * Enhanced Dashboard with mesh background, better visual hierarchy,
- * and staggered animations
- */
 export default function Dashboard() {
   const navigate = useNavigate();
   const [kpi, setKpi] = useState<KPI>({
@@ -36,19 +32,17 @@ export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Calculate KPIs
     const fetchData = async () => {
       setIsLoading(true);
       const jobs = await getJobs();
       const timeEntries = await getTimeEntries();
-      
-      const completedJobs = jobs.filter(job => job.status === 'completed');
-      const activeJobs = jobs.filter(job => job.status === 'in-progress');
-      const totalRevenue = completedJobs.reduce((sum, job) => sum + (job.actual_cost || 0), 0);
-      
-      // Calculate average job duration from time entries
+
+      const completedJobs = jobs.filter((job: Job) => job.status === 'completed');
+      const activeJobs = jobs.filter((job: Job) => job.status === 'in-progress');
+      const totalRevenue = completedJobs.reduce((sum: number, job: Job) => sum + (job.totalCost || 0), 0);
+
       const avgDuration = timeEntries.length > 0 
-        ? timeEntries.reduce((sum, entry) => sum + (entry.duration || 0), 0) / timeEntries.length / 60 // convert to hours
+        ? timeEntries.reduce((sum: number, entry: any) => sum + (entry.duration || 0), 0) / timeEntries.length / 60
         : 0;
 
       setKpi({
@@ -60,14 +54,13 @@ export default function Dashboard() {
         profitMargin: 85
       });
 
-      // Set recent jobs (last 5)
       const sortedJobs = jobs
-        .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
+        .sort((a: any, b: any) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
         .slice(0, 5);
       setRecentJobs(sortedJobs as any);
       setIsLoading(false);
     };
-    
+
     fetchData();
   }, []);
 
@@ -104,7 +97,6 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen mesh-bg">
       <div className="container mx-auto p-4 md:p-8 space-y-8 md:space-y-10">
-        {/* Header with Gradient and Animation */}
         {isLoading ? (
           <div className="space-y-3">
             <Skeleton className="h-12 w-64 rounded-lg glass-subtle animate-shimmer mb-2" />
@@ -121,23 +113,19 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* KPI Cards with Staggered Animation and Better Spacing */}
-        <div 
-          data-tour="kpi-cards" 
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"
-        >
+        <div data-tour="kpi-cards" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
           {isLoading ? (
             Array.from({ length: 6 }).map((_, i) => (
               <div
                 key={i}
-                className={`glass-subtle rounded-lg p-4 md:p-6 shadow-soft animate-slide-up-fade ${['delay-100', 'delay-200', 'delay-300', 'delay-400', 'delay-500', 'delay-600'][i] || ''}`}
+                className={`glass-subtle rounded-lg p-4 md:p-6 shadow-soft animate-slide-up-fade ${['delay-100','delay-200','delay-300','delay-400','delay-500','delay-600'][i] || ''}`}
               >
                 <div className="space-y-3">
-                  <Skeleton className="h-4 w-3/4 animate-shimmer rounded" /> {/* title */}
-                  <Skeleton className="h-10 w-full animate-shimmer rounded-lg" /> {/* value */}
+                  <Skeleton className="h-4 w-3/4 animate-shimmer rounded" />
+                  <Skeleton className="h-10 w-full animate-shimmer rounded-lg" />
                   <div className="flex items-center justify-between pt-2">
-                    <Skeleton className="h-6 w-16 animate-shimmer rounded" /> {/* change */}
-                    <Skeleton className="h-6 w-20 rounded-full animate-shimmer" /> {/* badge */}
+                    <Skeleton className="h-6 w-16 animate-shimmer rounded" />
+                    <Skeleton className="h-6 w-20 rounded-full animate-shimmer" />
                   </div>
                 </div>
               </div>
@@ -145,115 +133,27 @@ export default function Dashboard() {
           ) : (
             <>
               <div className="animate-slide-up-fade delay-100">
-                <StatCard
-                  title="Zakończone zlecenia"
-                  value={kpi.completedJobs}
-                  change={{ value: 12, label: 'w tym miesiącu' }}
-                  icon={CheckCircle}
-                  variant="premium"
-                />
+                <StatCard title="Zakończone zlecenia" value={kpi.completedJobs} change={{ value: 12, label: 'w tym miesiącu' }} icon={CheckCircle} variant="premium" />
               </div>
               <div className="animate-slide-up-fade delay-200">
-                <StatCard
-                  title="Łączne przychody"
-                  value={`${kpi.totalRevenue.toLocaleString('pl-PL')} zł`}
-                  change={{ value: 8, label: 'vs poprzedni miesiąc' }}
-                  icon={Euro}
-                  variant="elevated"
-                />
+                <StatCard title="Łączne przychody" value={`${kpi.totalRevenue.toLocaleString('pl-PL')} zł`} change={{ value: 8, label: 'vs poprzedni miesiąc' }} icon={Euro} variant="elevated" />
               </div>
               <div className="animate-slide-up-fade delay-300">
-                <StatCard
-                  title="Średni czas zlecenia"
-                  value={`${kpi.averageJobDuration}h`}
-                  change={{ value: -5, label: 'efektywność' }}
-                  icon={Clock}
-                  variant="default"
-                />
+                <StatCard title="Średni czas zlecenia" value={`${kpi.averageJobDuration}h`} change={{ value: -5, label: 'efektywność' }} icon={Clock} variant="default" />
               </div>
               <div className="animate-slide-up-fade delay-400">
-                <StatCard
-                  title="Średnia ocena"
-                  value={kpi.averageRating}
-                  change={{ value: 2, label: 'zadowolenie klientów' }}
-                  icon={Star}
-                  variant="default"
-                />
+                <StatCard title="Średnia ocena" value={kpi.averageRating} change={{ value: 2, label: 'zadowolenie klientów' }} icon={Star} variant="default" />
               </div>
               <div className="animate-slide-up-fade delay-500">
-                <StatCard
-                  title="Aktywne zlecenia"
-                  value={kpi.activeJobs}
-                  icon={Activity}
-                  variant="elevated"
-                />
+                <StatCard title="Aktywne zlecenia" value={kpi.activeJobs} icon={Activity} variant="elevated" />
               </div>
               <div className="animate-slide-up-fade delay-600">
-                <StatCard
-                  title="Marża zysku"
-                  value={`${kpi.profitMargin}%`}
-                  change={{ value: 3, label: 'rentowność' }}
-                  icon={TrendingUp}
-                  variant="default"
-                />
+                <StatCard title="Marża zysku" value={`${kpi.profitMargin}%`} change={{ value: 3, label: 'rentowność' }} icon={TrendingUp} variant="default" />
               </div>
             </>
-          <div className="animate-slide-up-fade delay-100">
-            <StatCard
-              title="Zakończone zlecenia"
-              value={kpi.completedJobs}
-              change={{ value: 12, label: 'w tym miesiącu' }}
-              icon={CheckCircle}
-              variant="premium"
-            />
-          </div>
-          <div className="animate-slide-up-fade delay-200">
-            <StatCard
-              title="Łączne przychody"
-              value={`${kpi.totalRevenue.toLocaleString('pl-PL')} zł`}
-              change={{ value: 8, label: 'vs poprzedni miesiąc' }}
-              icon={Euro}
-              variant="elevated"
-            />
-          </div>
-          <div className="animate-slide-up-fade delay-300">
-            <StatCard
-              title="Średni czas zlecenia"
-              value={`${kpi.averageJobDuration}h`}
-              change={{ value: -5, label: 'efektywność' }}
-              icon={Clock}
-              variant="default"
-            />
-          </div>
-          <div className="animate-slide-up-fade delay-400">
-            <StatCard
-              title="Średnia ocena"
-              value={kpi.averageRating}
-              change={{ value: 2, label: 'zadowolenie klientów' }}
-              icon={Star}
-              variant="default"
-            />
-          </div>
-          <div className="animate-slide-up-fade delay-500">
-            <StatCard
-              title="Aktywne zlecenia"
-              value={kpi.activeJobs}
-              icon={Activity}
-              variant="elevated"
-            />
-          </div>
-          <div className="animate-slide-up-fade delay-600">
-            <StatCard
-              title="Marża zysku"
-              value={`${kpi.profitMargin}%`}
-              change={{ value: 3, label: 'rentowność' }}
-              icon={TrendingUp}
-              variant="default"
-            />
-          </div>
+          )}
         </div>
 
-        {/* Recent Jobs with Better Separation */}
         <div className="space-y-6 animate-slide-up-fade delay-500">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl md:text-3xl font-bold font-poppins text-foreground">
@@ -268,10 +168,7 @@ export default function Dashboard() {
             </Button>
           </div>
 
-          <Card 
-            data-tour="recent-jobs" 
-            className="glass-premium border-none shadow-strong overflow-hidden"
-          >
+          <Card data-tour="recent-jobs" className="glass-premium border-none shadow-strong overflow-hidden">
             <CardContent className="p-6 md:p-8">
               <div className="space-y-4">
                 {recentJobs.length > 0 ? (

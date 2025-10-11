@@ -44,19 +44,14 @@ export default function Clients() {
     try {
       const data = await getClients();
       setClients(data);
-      setIsLoading(false);
     } catch (error) {
       toast({
         title: "Error",
         description: "Failed to load clients",
         variant: "destructive"
       });
+    } finally {
       setIsLoading(false);
-    }
-        title: "Error",
-        description: "Failed to load clients",
-        variant: "destructive"
-      });
     }
   };
 
@@ -217,7 +212,7 @@ export default function Clients() {
           </Dialog>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
           {isLoading ? (
             Array.from({ length: 6 }).map((_, i) => (
               <Card key={i} className="glass-subtle rounded-lg shadow-soft min-h-[200px]">
@@ -301,8 +296,7 @@ export default function Clients() {
                 </CardContent>
               </Card>
             ))
-
-          ))}
+          )}
         </div>
 
         {(!isLoading && clients.length === 0) && (
