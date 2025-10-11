@@ -44,17 +44,21 @@ const SettingsPage = () => {
   const status = getPermissionStatus();
 
   return (
-    <div className="container mx-auto p-4 space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
-            <Settings className="h-5 w-5" />
-          </Button>
-          <h1 className="text-2xl font-bold">Ustawienia</h1>
+    <div className="min-h-screen mesh-bg pb-24">
+      <div className="container mx-auto p-4 md:p-8 space-y-8 animate-fade-in">
+        <div className="flex items-center justify-between animate-slide-up-fade">
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-gradient-primary rounded-2xl text-primary-foreground shadow-glow">
+              <Settings className="h-7 w-7" />
+            </div>
+            <div>
+              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-hero bg-clip-text text-transparent font-poppins">Ustawienia</h1>
+              <p className="text-muted-foreground mt-2 font-inter text-sm md:text-base">Konfiguracja aplikacji</p>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <Card>
+        <Card className="glass-premium border-none shadow-medium">
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <Bell className="h-5 w-5" />
@@ -160,6 +164,7 @@ const SettingsPage = () => {
       <Button onClick={handleSave} className="w-full">
         Zapisz ustawienia
       </Button>
+      </div>
     </div>
   );
 };

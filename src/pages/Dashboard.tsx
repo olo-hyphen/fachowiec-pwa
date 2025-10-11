@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { StatCard } from '@/components/ui/stat-card';
 import { getJobs, getTimeEntries, initializeSampleData } from '@/lib/storage';
 import { Job, TimeEntry, KPI } from '@/types';
@@ -14,7 +16,12 @@ import {
   AlertCircle
 } from 'lucide-react';
 
+/**
+ * Enhanced Dashboard with mesh background, better visual hierarchy,
+ * and staggered animations
+ */
 export default function Dashboard() {
+  const navigate = useNavigate();
   const [kpi, setKpi] = useState<KPI>({
     completedJobs: 0,
     totalRevenue: 0,
@@ -91,109 +98,143 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="container mx-auto p-4 md:p-6 space-y-6 md:space-y-8">
-      <div className="space-y-2 animate-fade-in">
-        <h1 className="text-3xl md:text-4xl font-bold tracking-tight bg-gradient-hero bg-clip-text text-transparent font-poppins">
-          Dashboard
-        </h1>
-        <p className="text-muted-foreground text-sm md:text-base">
-          Przegląd Twoich zleceń i wyników biznesowych
-        </p>
-      </div>
+    <div className="min-h-screen mesh-bg">
+      <div className="container mx-auto p-4 md:p-8 space-y-8 md:space-y-10">
+        {/* Header with Gradient and Animation */}
+        <div className="space-y-3 animate-slide-up-fade">
+          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-hero bg-clip-text text-transparent font-poppins">
+            Dashboard
+          </h1>
+          <p className="text-muted-foreground font-inter text-sm md:text-base">
+            Przegląd Twojej działalności
+          </p>
+        </div>
 
-      {/* KPI Cards */}
-      <div data-tour="kpi-cards" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6 animate-fade-in">
-        <div className="animate-bounce-in" style={{animationDelay: '0.1s'}}>
-          <StatCard
-            title="Zakończone zlecenia"
-            value={kpi.completedJobs}
-            change={{ value: 12, label: 'w tym miesiącu' }}
-            icon={CheckCircle}
-          />
+        {/* KPI Cards with Staggered Animation and Better Spacing */}
+        <div 
+          data-tour="kpi-cards" 
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"
+        >
+          <div className="animate-slide-up-fade delay-100">
+            <StatCard
+              title="Zakończone zlecenia"
+              value={kpi.completedJobs}
+              change={{ value: 12, label: 'w tym miesiącu' }}
+              icon={CheckCircle}
+              variant="premium"
+            />
+          </div>
+          <div className="animate-slide-up-fade delay-200">
+            <StatCard
+              title="Łączne przychody"
+              value={`${kpi.totalRevenue.toLocaleString('pl-PL')} zł`}
+              change={{ value: 8, label: 'vs poprzedni miesiąc' }}
+              icon={Euro}
+              variant="elevated"
+            />
+          </div>
+          <div className="animate-slide-up-fade delay-300">
+            <StatCard
+              title="Średni czas zlecenia"
+              value={`${kpi.averageJobDuration}h`}
+              change={{ value: -5, label: 'efektywność' }}
+              icon={Clock}
+              variant="default"
+            />
+          </div>
+          <div className="animate-slide-up-fade delay-400">
+            <StatCard
+              title="Średnia ocena"
+              value={kpi.averageRating}
+              change={{ value: 2, label: 'zadowolenie klientów' }}
+              icon={Star}
+              variant="default"
+            />
+          </div>
+          <div className="animate-slide-up-fade delay-500">
+            <StatCard
+              title="Aktywne zlecenia"
+              value={kpi.activeJobs}
+              icon={Activity}
+              variant="elevated"
+            />
+          </div>
+          <div className="animate-slide-up-fade delay-600">
+            <StatCard
+              title="Marża zysku"
+              value={`${kpi.profitMargin}%`}
+              change={{ value: 3, label: 'rentowność' }}
+              icon={TrendingUp}
+              variant="default"
+            />
+          </div>
         </div>
-        <div className="animate-bounce-in" style={{animationDelay: '0.2s'}}>
-          <StatCard
-            title="Łączne przychody"
-            value={`${kpi.totalRevenue.toLocaleString('pl-PL')} zł`}
-            change={{ value: 8, label: 'vs poprzedni miesiąc' }}
-            icon={Euro}
-          />
-        </div>
-        <div className="animate-bounce-in" style={{animationDelay: '0.3s'}}>
-          <StatCard
-            title="Średni czas zlecenia"
-            value={`${kpi.averageJobDuration}h`}
-            change={{ value: -5, label: 'efektywność' }}
-            icon={Clock}
-          />
-        </div>
-        <div className="animate-bounce-in" style={{animationDelay: '0.4s'}}>
-          <StatCard
-            title="Średnia ocena"
-            value={kpi.averageRating}
-            change={{ value: 2, label: 'zadowolenie klientów' }}
-            icon={Star}
-          />
-        </div>
-        <div className="animate-bounce-in" style={{animationDelay: '0.5s'}}>
-          <StatCard
-            title="Aktywne zlecenia"
-            value={kpi.activeJobs}
-            icon={Activity}
-          />
-        </div>
-        <div className="animate-bounce-in" style={{animationDelay: '0.6s'}}>
-          <StatCard
-            title="Marża zysku"
-            value={`${kpi.profitMargin}%`}
-            change={{ value: 3, label: 'rentowność' }}
-            icon={TrendingUp}
-          />
-        </div>
-      </div>
 
-      {/* Recent Jobs */}
-      <Card data-tour="recent-jobs" className="glass-card border-none shadow-glass animate-fade-in mt-8">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-lg font-poppins">
-            <Briefcase className="h-5 w-5 text-primary" />
-            Ostatnie zlecenia
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {recentJobs.map((job, index) => (
-              <div
-                key={job.id}
-                className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 sm:p-4 glass rounded-xl hover:shadow-glass transition-all duration-300 hover:scale-[1.02] group gap-3 sm:gap-4"
-                style={{animationDelay: `${0.7 + index * 0.1}s`}}
-              >
-                <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto">
-                  <div className="group-hover:scale-110 transition-transform duration-300 flex-shrink-0">
-                    {getStatusIcon(job.status)}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <h3 className="font-medium text-foreground font-inter group-hover:text-primary transition-colors truncate">
-                      {job.title}
-                    </h3>
-                    <p className="text-xs sm:text-sm text-muted-foreground truncate">
-                      {job.clientName} • {job.address}
+        {/* Recent Jobs with Better Separation */}
+        <div className="space-y-6 animate-slide-up-fade delay-500">
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl md:text-3xl font-bold font-poppins text-foreground">
+              Ostatnie zlecenia
+            </h2>
+            <Button 
+              variant="outline" 
+              className="glass-card border-primary/30 hover-glow transition-glass active-press"
+              onClick={() => navigate('/jobs')}
+            >
+              Zobacz wszystkie
+            </Button>
+          </div>
+
+          <Card 
+            data-tour="recent-jobs" 
+            className="glass-premium border-none shadow-strong overflow-hidden"
+          >
+            <CardContent className="p-6 md:p-8">
+              <div className="space-y-4">
+                {recentJobs.length > 0 ? (
+                  recentJobs.map((job, index) => (
+                    <div 
+                      key={job.id}
+                      className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 md:p-5 rounded-xl glass-subtle hover-lift transition-glass cursor-pointer gap-3 animate-slide-up-fade"
+                      style={{ animationDelay: `${600 + index * 100}ms` }}
+                      onClick={() => navigate(`/jobs`)}
+                    >
+                      <div className="flex items-center gap-4 w-full sm:w-auto flex-1">
+                        <div className="flex-shrink-0 transition-transform hover:scale-110">
+                          {getStatusIcon(job.status)}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <h3 className="font-semibold text-foreground font-inter mb-1 hover:text-primary transition-colors">
+                            {job.title}
+                          </h3>
+                          <p className="text-sm text-muted-foreground truncate">
+                            {job.clientName} • {job.address}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-left sm:text-right w-full sm:w-auto flex-shrink-0">
+                        <p className="font-bold text-foreground font-poppins text-base md:text-lg bg-gradient-primary bg-clip-text text-transparent">
+                          {job.totalCost.toLocaleString('pl-PL')} zł
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {getStatusText(job.status)}
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-12">
+                    <Briefcase className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-50" />
+                    <p className="text-muted-foreground font-inter">
+                      Brak ostatnich zleceń
                     </p>
                   </div>
-                </div>
-                <div className="text-left sm:text-right w-full sm:w-auto flex-shrink-0">
-                  <p className="font-semibold text-foreground font-poppins text-sm sm:text-base">
-                    {job.totalCost.toLocaleString('pl-PL')} zł
-                  </p>
-                  <p className="text-xs sm:text-sm text-muted-foreground">
-                    {getStatusText(job.status)}
-                  </p>
-                </div>
+                )}
               </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 }

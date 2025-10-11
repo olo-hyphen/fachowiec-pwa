@@ -74,16 +74,18 @@ export default function Calendar() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20 pb-24">
-      <div className="container mx-auto p-4 md:p-6 space-y-6 animate-fade-in">
-        <div className="flex items-center justify-between">
+    <div className="min-h-screen mesh-bg pb-24">
+      <div className="container mx-auto p-4 md:p-8 space-y-8 animate-fade-in">
+        <div className="flex items-center justify-between animate-slide-up-fade">
           <div className="flex items-center gap-3">
-            <CalendarIcon className="h-8 w-8 text-primary" />
+            <div className="p-3 bg-gradient-primary rounded-2xl text-primary-foreground shadow-glow">
+              <CalendarIcon className="h-7 w-7" />
+            </div>
             <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-hero bg-clip-text text-transparent font-poppins">
                 Kalendarz
               </h1>
-              <p className="text-muted-foreground mt-1">Plan prac i terminów</p>
+              <p className="text-muted-foreground mt-2 font-inter text-sm md:text-base">Plan prac i terminów</p>
             </div>
           </div>
         </div>
@@ -176,7 +178,7 @@ export default function Calendar() {
         </Card>
 
         {selectedDate && (
-          <Card className="glass-effect">
+          <Card className="glass-premium border-none shadow-medium">
             <CardHeader>
               <CardTitle>
                 Zlecenia na {format(selectedDate, "dd MMMM yyyy", { locale: pl })}

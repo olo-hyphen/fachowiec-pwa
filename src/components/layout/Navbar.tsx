@@ -31,6 +31,9 @@ const navigation = [
   { name: 'Ustawienia', href: '/settings', icon: Settings },
 ];
 
+/**
+ * Enhanced Navbar with premium glassmorphism and better visual hierarchy
+ */
 export default function Navbar() {
   const location = useLocation();
 
@@ -46,13 +49,13 @@ export default function Navbar() {
             to={item.href}
             data-tour={item.dataTour}
             className={cn(
-              'flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium transition-all duration-300 hover:scale-105 font-inter',
+              'flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium transition-glass font-inter active-press',
               isActive
-                ? 'bg-gradient-primary text-primary-foreground shadow-glow'
-                : 'text-muted-foreground hover:text-foreground hover:bg-muted/50 hover:shadow-soft'
+                ? 'bg-gradient-primary text-primary-foreground shadow-glow scale-105'
+                : 'text-muted-foreground hover:text-foreground glass-subtle hover:scale-102 hover-glow'
             )}
           >
-            <Icon className="h-5 w-5" />
+            <Icon className="h-5 w-5 transition-transform group-hover:scale-110" />
             {item.name}
           </Link>
         );
@@ -63,25 +66,28 @@ export default function Navbar() {
   return (
     <>
       {/* Desktop Navbar */}
-      <nav className="hidden md:flex glass-card border-none shadow-glass sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
+      <nav className="hidden md:flex glass-premium border-none shadow-strong sticky top-0 z-50 backdrop-blur-3xl">
+        <div className="w-full px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16 items-center">
             <div className="flex items-center">
               <Link 
                 to="/" 
-                className="flex items-center gap-3 text-xl font-bold text-foreground font-poppins hover:scale-105 transition-transform duration-300"
+                className="flex items-center gap-3 text-xl font-bold text-foreground font-poppins hover:scale-105 transition-all duration-300 active-press group"
               >
-                <div className="p-2 bg-gradient-primary rounded-2xl text-primary-foreground shadow-glow">
+                <div className="p-2.5 bg-gradient-primary rounded-2xl text-primary-foreground shadow-glow group-hover:shadow-strong group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
                   <Briefcase className="h-6 w-6" />
                 </div>
-                <span className="bg-gradient-primary bg-clip-text text-transparent">
+                <span className="bg-gradient-hero bg-clip-text text-transparent">
                   FachowiecApp
                 </span>
               </Link>
             </div>
             
-            <div className="flex items-center space-x-2">
-              <NavLinks />
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1">
+                <NavLinks />
+              </div>
+              <div className="h-8 w-px bg-border mx-2" />
               <div data-tour="pwa-status">
                 <PWAStatus />
               </div>
@@ -97,16 +103,16 @@ export default function Navbar() {
       </nav>
 
       {/* Mobile Navbar */}
-      <div className="md:hidden glass-card border-none shadow-glass sticky top-0 z-50">
+      <div className="md:hidden glass-premium border-none shadow-strong sticky top-0 z-50 backdrop-blur-3xl">
         <div className="flex justify-between items-center px-4 h-16">
           <Link 
             to="/" 
-            className="flex items-center gap-3 text-lg font-bold text-foreground font-poppins hover:scale-105 transition-transform duration-300"
+            className="flex items-center gap-2.5 text-lg font-bold text-foreground font-poppins hover:scale-105 transition-all duration-300 active-press group"
           >
-            <div className="p-2 bg-gradient-primary rounded-xl text-primary-foreground shadow-glow">
+            <div className="p-2 bg-gradient-primary rounded-xl text-primary-foreground shadow-glow group-hover:shadow-strong group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
               <Briefcase className="h-5 w-5" />
             </div>
-            <span className="bg-gradient-primary bg-clip-text text-transparent">
+            <span className="bg-gradient-hero bg-clip-text text-transparent">
               FachowiecApp
             </span>
           </Link>
@@ -115,12 +121,21 @@ export default function Navbar() {
             <ThemeToggle />
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="sm" className="hover:bg-muted/50 hover:scale-110 transition-all duration-300">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="glass-subtle hover:scale-110 transition-glass active-press hover-glow min-w-[44px] min-h-[44px]"
+                >
                   <Menu className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-64 glass-card border-none">
+              <SheetContent side="right" className="w-72 glass-premium border-l border-primary/20">
                 <div className="flex flex-col gap-3 pt-8">
+                  <div className="mb-4 pb-4 border-b border-border">
+                    <h2 className="text-xl font-bold bg-gradient-hero bg-clip-text text-transparent font-poppins">
+                      Menu
+                    </h2>
+                  </div>
                   <NavLinks />
                 </div>
               </SheetContent>
