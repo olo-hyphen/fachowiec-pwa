@@ -29,6 +29,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { pl } from 'date-fns/locale';
+import { JobsPageSkeleton } from '@/components/ui/jobs-page-skeleton';
 
 export default function Jobs() {
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -41,6 +42,7 @@ export default function Jobs() {
   const [editingJob, setEditingJob] = useState<Job | null>(null);
   const [scheduledDate, setScheduledDate] = useState<Date | undefined>(undefined);
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
   const [formData, setFormData] = useState({
@@ -69,8 +71,20 @@ export default function Jobs() {
   }, [jobs, searchTerm, statusFilter, priorityFilter, sortBy]);
 
   const loadJobs = async () => {
-    const allJobs = await getJobs();
-    setJobs(allJobs as any);
+    setIsLoading(true);
+    try {
+      const allJobs = await getJobs();
+      setJobs(allJobs as any);
+    } catch (error) {
+      console.error("Failed to load jobs", error);
+      toast({
+        title: "Błąd",
+        description: "Nie udało się wczytać zleceń.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const filterJobs = () => {
@@ -312,513 +326,517 @@ export default function Jobs() {
 
   return (
     <div className="min-h-screen mesh-bg pb-safe">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
-        {/* Header with Enhanced Styling */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 gap-4 animate-slide-up-fade">
-          <div>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-hero bg-clip-text text-transparent font-poppins mb-2">Zlecenia</h1>
-            <p className="text-sm md:text-base text-muted-foreground font-inter">
-              Zarządzaj swoimi zleceniami i projektami
-            </p>
-          </div>
-          
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button
-                data-tour="add-job-button"
-                onClick={resetForm}
-                className="bg-gradient-primary hover:shadow-glow transition-glass active-press w-full sm:w-auto shadow-medium"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Nowe zlecenie
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl max-h-[90vh] md:max-h-[85vh] overflow-y-auto">
-              <DialogHeader className="sticky top-0 bg-background z-10 pb-4">
-                <DialogTitle className="text-lg md:text-xl">
-                  {editingJob ? 'Edytuj zlecenie' : 'Nowe zlecenie'}
-                </DialogTitle>
-              </DialogHeader>
+      {isLoading ? (
+        <JobsPageSkeleton />
+      ) : (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
+          {/* Header with Enhanced Styling */}
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 gap-4 animate-slide-up-fade">
+            <div>
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-hero bg-clip-text text-transparent font-poppins mb-2">Zlecenia</h1>
+              <p className="text-sm md:text-base text-muted-foreground font-inter">
+                Zarządzaj swoimi zleceniami i projektami
+              </p>
+            </div>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <Label htmlFor="title">Tytuł zlecenia *</Label>
-                  <Input
-                    id="title"
-                    value={formData.title}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    placeholder="np. Remont łazienki"
-                  />
-                </div>
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button
+                  data-tour="add-job-button"
+                  onClick={resetForm}
+                  className="bg-gradient-primary hover:shadow-glow transition-glass active-press w-full sm:w-auto shadow-medium"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Nowe zlecenie
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl max-h-[90vh] md:max-h-[85vh] overflow-y-auto">
+                <DialogHeader className="sticky top-0 bg-background z-10 pb-4">
+                  <DialogTitle className="text-lg md:text-xl">
+                    {editingJob ? 'Edytuj zlecenie' : 'Nowe zlecenie'}
+                  </DialogTitle>
+                </DialogHeader>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
-                    <Label htmlFor="status">Status</Label>
-                    <Select 
-                      value={formData.status} 
-                      onValueChange={(value: JobStatus) => setFormData({ ...formData, status: value })}
+                    <Label htmlFor="title">Tytuł zlecenia *</Label>
+                    <Input
+                      id="title"
+                      value={formData.title}
+                      onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                      placeholder="np. Remont łazienki"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <Label htmlFor="status">Status</Label>
+                      <Select
+                        value={formData.status}
+                        onValueChange={(value: JobStatus) => setFormData({ ...formData, status: value })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="pending">Oczekujące</SelectItem>
+                          <SelectItem value="in-progress">W trakcie</SelectItem>
+                          <SelectItem value="completed">Zakończone</SelectItem>
+                          <SelectItem value="cancelled">Anulowane</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="priority">Priorytet</Label>
+                      <Select
+                        value={formData.priority}
+                        onValueChange={(value: JobPriority) => setFormData({ ...formData, priority: value })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="low">Niski</SelectItem>
+                          <SelectItem value="medium">Średni</SelectItem>
+                          <SelectItem value="high">Wysoki</SelectItem>
+                          <SelectItem value="urgent">Pilne</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="category">Kategoria</Label>
+                      <Input
+                        id="category"
+                        value={formData.category}
+                        onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                        placeholder="np. Hydraulika"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="description">Opis</Label>
+                    <Textarea
+                      id="description"
+                      value={formData.description}
+                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                      placeholder="Szczegółowy opis prac do wykonania..."
+                      rows={3}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="clientName">Nazwa klienta *</Label>
+                      <Input
+                        id="clientName"
+                        value={formData.clientName}
+                        onChange={(e) => setFormData({ ...formData, clientName: e.target.value })}
+                        placeholder="Jan Kowalski"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="clientPhone">Telefon</Label>
+                      <Input
+                        id="clientPhone"
+                        value={formData.clientPhone}
+                        onChange={(e) => setFormData({ ...formData, clientPhone: e.target.value })}
+                        placeholder="+48 123 456 789"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="clientEmail">Email</Label>
+                    <Input
+                      id="clientEmail"
+                      type="email"
+                      value={formData.clientEmail}
+                      onChange={(e) => setFormData({ ...formData, clientEmail: e.target.value })}
+                      placeholder="jan@example.com"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="address">Adres *</Label>
+                    <Input
+                      id="address"
+                      value={formData.address}
+                      onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                      placeholder="ul. Przykładowa 15, Warszawa"
+                    />
+                  </div>
+
+                  <div>
+                    <Label>Data planowana</Label>
+                    <div className="mt-2 flex flex-wrap items-center gap-2">
+                      <Popover open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
+                        <PopoverTrigger asChild>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            className={`w-full sm:flex-1 justify-start text-left font-normal ${!scheduledDate ? 'text-muted-foreground' : ''}`}
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {scheduledDate ? format(scheduledDate, 'PPP', { locale: pl }) : 'Wybierz datę'}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <CalendarComponent
+                            mode="single"
+                            selected={scheduledDate}
+                            onSelect={(date) => {
+                              setScheduledDate(date ?? undefined);
+                              setFormData((prev) => ({
+                                ...prev,
+                                scheduled_date: date ? date.toISOString().split('T')[0] : ''
+                              }));
+                              if (date) {
+                                setIsDatePickerOpen(false);
+                              }
+                            }}
+                            locale={pl}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      {scheduledDate && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => {
+                            setScheduledDate(undefined);
+                            setFormData((prev) => ({ ...prev, scheduled_date: '' }));
+                            setIsDatePickerOpen(false);
+                          }}
+                          aria-label="Wyczyść datę planowaną"
+                          className="h-10 w-10"
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="estimatedHours">Szacowane godziny *</Label>
+                      <Input
+                        id="estimatedHours"
+                        type="number"
+                        value={formData.estimatedHours}
+                        onChange={(e) => setFormData({ ...formData, estimatedHours: e.target.value })}
+                        placeholder="40"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="hourlyRate">Stawka godzinowa (zł) *</Label>
+                      <Input
+                        id="hourlyRate"
+                        type="number"
+                        value={formData.hourlyRate}
+                        onChange={(e) => setFormData({ ...formData, hourlyRate: e.target.value })}
+                        placeholder="80"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="tags">Tagi (oddziel przecinkami)</Label>
+                    <Input
+                      id="tags"
+                      value={formData.tags}
+                      onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
+                      placeholder="np. remont, łazienka, pilne"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="notes">Notatki</Label>
+                    <Textarea
+                      id="notes"
+                      value={formData.notes}
+                      onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                      placeholder="Dodatkowe uwagi i notatki..."
+                      rows={3}
+                    />
+                  </div>
+
+                  {formData.estimatedHours && formData.hourlyRate && (
+                    <div className="p-4 bg-secondary/50 rounded-lg">
+                      <p className="text-sm text-muted-foreground">Szacowana wartość zlecenia:</p>
+                      <p className="text-lg font-semibold text-foreground">
+                        {(parseInt(formData.estimatedHours) * parseInt(formData.hourlyRate)).toLocaleString('pl-PL')} zł
+                      </p>
+                    </div>
+                  )}
+
+                  <div className="flex justify-end gap-2 sticky bottom-0 bg-background pt-4 pb-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setIsDialogOpen(false)}
+                      className="flex-1 sm:flex-none"
                     >
-                      <SelectTrigger>
-                        <SelectValue />
+                      Anuluj
+                    </Button>
+                    <Button type="submit" className="flex-1 sm:flex-none">
+                      {editingJob ? 'Zaktualizuj' : 'Utwórz'} zlecenie
+                    </Button>
+                  </div>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </div>
+
+          {/* Filters with Glass Effect */}
+          <Card className="mb-6 md:mb-8 glass-premium border-none shadow-medium">
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-3">
+                  <div className="w-full">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        data-tour="search-input"
+                        placeholder="Szukaj zleceń..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-10"
+                      />
+                    </div>
+                  </div>
+                  <div data-tour="filters" className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <Select value={statusFilter} onValueChange={setStatusFilter}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Status" />
                       </SelectTrigger>
                       <SelectContent>
+                        <SelectItem value="all">Wszystkie</SelectItem>
                         <SelectItem value="pending">Oczekujące</SelectItem>
                         <SelectItem value="in-progress">W trakcie</SelectItem>
                         <SelectItem value="completed">Zakończone</SelectItem>
                         <SelectItem value="cancelled">Anulowane</SelectItem>
                       </SelectContent>
                     </Select>
-                  </div>
-                  <div>
-                    <Label htmlFor="priority">Priorytet</Label>
-                    <Select 
-                      value={formData.priority} 
-                      onValueChange={(value: JobPriority) => setFormData({ ...formData, priority: value })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
+                    <Select value={priorityFilter} onValueChange={setPriorityFilter}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Priorytet" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="low">Niski</SelectItem>
-                        <SelectItem value="medium">Średni</SelectItem>
-                        <SelectItem value="high">Wysoki</SelectItem>
+                        <SelectItem value="all">Wszystkie</SelectItem>
                         <SelectItem value="urgent">Pilne</SelectItem>
+                        <SelectItem value="high">Wysoki</SelectItem>
+                        <SelectItem value="medium">Średni</SelectItem>
+                        <SelectItem value="low">Niski</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Select value={sortBy} onValueChange={setSortBy}>
+                      <SelectTrigger className="w-full">
+                        <ArrowUpDown className="h-4 w-4 mr-2" />
+                        <SelectValue placeholder="Sortuj" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="date-desc">Najnowsze</SelectItem>
+                        <SelectItem value="date-asc">Najstarsze</SelectItem>
+                        <SelectItem value="priority">Priorytet</SelectItem>
+                        <SelectItem value="cost-desc">Wartość: malejąco</SelectItem>
+                        <SelectItem value="cost-asc">Wartość: rosnąco</SelectItem>
+                        <SelectItem value="name">Nazwa A-Z</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
-                  <div>
-                    <Label htmlFor="category">Kategoria</Label>
-                    <Input
-                      id="category"
-                      value={formData.category}
-                      onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                      placeholder="np. Hydraulika"
-                    />
-                  </div>
                 </div>
 
-                <div>
-                  <Label htmlFor="description">Opis</Label>
-                  <Textarea
-                    id="description"
-                    value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    placeholder="Szczegółowy opis prac do wykonania..."
-                    rows={3}
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="clientName">Nazwa klienta *</Label>
-                    <Input
-                      id="clientName"
-                      value={formData.clientName}
-                      onChange={(e) => setFormData({ ...formData, clientName: e.target.value })}
-                      placeholder="Jan Kowalski"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="clientPhone">Telefon</Label>
-                    <Input
-                      id="clientPhone"
-                      value={formData.clientPhone}
-                      onChange={(e) => setFormData({ ...formData, clientPhone: e.target.value })}
-                      placeholder="+48 123 456 789"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <Label htmlFor="clientEmail">Email</Label>
-                  <Input
-                    id="clientEmail"
-                    type="email"
-                    value={formData.clientEmail}
-                    onChange={(e) => setFormData({ ...formData, clientEmail: e.target.value })}
-                    placeholder="jan@example.com"
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="address">Adres *</Label>
-                  <Input
-                    id="address"
-                    value={formData.address}
-                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                    placeholder="ul. Przykładowa 15, Warszawa"
-                  />
-                </div>
-
-                <div>
-                  <Label>Data planowana</Label>
-                  <div className="mt-2 flex flex-wrap items-center gap-2">
-                    <Popover open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
-                      <PopoverTrigger asChild>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          className={`w-full sm:flex-1 justify-start text-left font-normal ${!scheduledDate ? 'text-muted-foreground' : ''}`}
-                        >
-                          <CalendarIcon className="mr-2 h-4 w-4" />
-                          {scheduledDate ? format(scheduledDate, 'PPP', { locale: pl }) : 'Wybierz datę'}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <CalendarComponent
-                          mode="single"
-                          selected={scheduledDate}
-                          onSelect={(date) => {
-                            setScheduledDate(date ?? undefined);
-                            setFormData((prev) => ({
-                              ...prev,
-                              scheduled_date: date ? date.toISOString().split('T')[0] : ''
-                            }));
-                            if (date) {
-                              setIsDatePickerOpen(false);
-                            }
-                          }}
-                          locale={pl}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
-                    {scheduledDate && (
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => {
-                          setScheduledDate(undefined);
-                          setFormData((prev) => ({ ...prev, scheduled_date: '' }));
-                          setIsDatePickerOpen(false);
-                        }}
-                        aria-label="Wyczyść datę planowaną"
-                        className="h-10 w-10"
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    )}
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="estimatedHours">Szacowane godziny *</Label>
-                    <Input
-                      id="estimatedHours"
-                      type="number"
-                      value={formData.estimatedHours}
-                      onChange={(e) => setFormData({ ...formData, estimatedHours: e.target.value })}
-                      placeholder="40"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="hourlyRate">Stawka godzinowa (zł) *</Label>
-                    <Input
-                      id="hourlyRate"
-                      type="number"
-                      value={formData.hourlyRate}
-                      onChange={(e) => setFormData({ ...formData, hourlyRate: e.target.value })}
-                      placeholder="80"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <Label htmlFor="tags">Tagi (oddziel przecinkami)</Label>
-                  <Input
-                    id="tags"
-                    value={formData.tags}
-                    onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-                    placeholder="np. remont, łazienka, pilne"
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="notes">Notatki</Label>
-                  <Textarea
-                    id="notes"
-                    value={formData.notes}
-                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                    placeholder="Dodatkowe uwagi i notatki..."
-                    rows={3}
-                  />
-                </div>
-
-                {formData.estimatedHours && formData.hourlyRate && (
-                  <div className="p-4 bg-secondary/50 rounded-lg">
-                    <p className="text-sm text-muted-foreground">Szacowana wartość zlecenia:</p>
-                    <p className="text-lg font-semibold text-foreground">
-                      {(parseInt(formData.estimatedHours) * parseInt(formData.hourlyRate)).toLocaleString('pl-PL')} zł
-                    </p>
-                  </div>
-                )}
-
-                <div className="flex justify-end gap-2 sticky bottom-0 bg-background pt-4 pb-2">
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    onClick={() => setIsDialogOpen(false)}
-                    className="flex-1 sm:flex-none"
-                  >
-                    Anuluj
-                  </Button>
-                  <Button type="submit" className="flex-1 sm:flex-none">
-                    {editingJob ? 'Zaktualizuj' : 'Utwórz'} zlecenie
-                  </Button>
-                </div>
-              </form>
-            </DialogContent>
-          </Dialog>
-        </div>
-
-        {/* Filters with Glass Effect */}
-        <Card className="mb-6 md:mb-8 glass-premium border-none shadow-medium">
-          <CardContent className="p-4 sm:p-6">
-            <div className="flex flex-col gap-4">
-              <div className="flex flex-col gap-3">
-                <div className="w-full">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      data-tour="search-input"
-                      placeholder="Szukaj zleceń..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10"
-                    />
-                  </div>
-                </div>
-                <div data-tour="filters" className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                  <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Wszystkie</SelectItem>
-                      <SelectItem value="pending">Oczekujące</SelectItem>
-                      <SelectItem value="in-progress">W trakcie</SelectItem>
-                      <SelectItem value="completed">Zakończone</SelectItem>
-                      <SelectItem value="cancelled">Anulowane</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Select value={priorityFilter} onValueChange={setPriorityFilter}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Priorytet" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Wszystkie</SelectItem>
-                      <SelectItem value="urgent">Pilne</SelectItem>
-                      <SelectItem value="high">Wysoki</SelectItem>
-                      <SelectItem value="medium">Średni</SelectItem>
-                      <SelectItem value="low">Niski</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Select value={sortBy} onValueChange={setSortBy}>
-                    <SelectTrigger className="w-full">
-                      <ArrowUpDown className="h-4 w-4 mr-2" />
-                      <SelectValue placeholder="Sortuj" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="date-desc">Najnowsze</SelectItem>
-                      <SelectItem value="date-asc">Najstarsze</SelectItem>
-                      <SelectItem value="priority">Priorytet</SelectItem>
-                      <SelectItem value="cost-desc">Wartość: malejąco</SelectItem>
-                      <SelectItem value="cost-asc">Wartość: rosnąco</SelectItem>
-                      <SelectItem value="name">Nazwa A-Z</SelectItem>
-                    </SelectContent>
-                  </Select>
+                <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                  <span className="flex items-center gap-1">
+                    Znaleziono: <span className="font-semibold text-foreground">{filteredJobs.length}</span>
+                  </span>
+                  {(statusFilter !== 'all' || priorityFilter !== 'all' || searchTerm) && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setSearchTerm('');
+                        setStatusFilter('all');
+                        setPriorityFilter('all');
+                      }}
+                    >
+                      Wyczyść filtry
+                    </Button>
+                  )}
                 </div>
               </div>
-              
-              <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                <span className="flex items-center gap-1">
-                  Znaleziono: <span className="font-semibold text-foreground">{filteredJobs.length}</span>
-                </span>
-                {(statusFilter !== 'all' || priorityFilter !== 'all' || searchTerm) && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      setSearchTerm('');
-                      setStatusFilter('all');
-                      setPriorityFilter('all');
-                    }}
-                  >
-                    Wyczyść filtry
-                  </Button>
-                )}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
 
-        {/* Enhanced Jobs List */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-          {filteredJobs.map((job, index) => (
-            <Card 
-              key={job.id} 
-              data-tour={index === 0 ? 'job-card' : undefined} 
-              className="glass-premium border-none shadow-medium hover-lift hover-glow transition-glass group overflow-hidden animate-slide-up-fade"
-              style={{ animationDelay: `${index * 50}ms` }}
-            >
-              {/* Status Indicator Bar */}
-              <div className={`h-1.5 w-full ${
-                job.status === 'completed' ? 'bg-success' :
-                job.status === 'in-progress' ? 'bg-info' :
-                job.status === 'pending' ? 'bg-warning' :
-                'bg-destructive'
-              }`} />
-              
-              <CardHeader className="pb-3 p-5 md:p-6">
-                <div className="flex justify-between items-start gap-2">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-2">
-                      {getPriorityIcon(job.priority)}
-                      <CardTitle className="text-base sm:text-lg font-poppins group-hover:text-primary transition-colors truncate">{job.title}</CardTitle>
+          {/* Enhanced Jobs List */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+            {filteredJobs.map((job, index) => (
+              <Card
+                key={job.id}
+                data-tour={index === 0 ? 'job-card' : undefined}
+                className="glass-premium border-none shadow-medium hover-lift hover-glow transition-glass group overflow-hidden animate-slide-up-fade"
+                style={{ animationDelay: `${index * 50}ms` }}
+              >
+                {/* Status Indicator Bar */}
+                <div className={`h-1.5 w-full ${
+                  job.status === 'completed' ? 'bg-success' :
+                  job.status === 'in-progress' ? 'bg-info' :
+                  job.status === 'pending' ? 'bg-warning' :
+                  'bg-destructive'
+                }`} />
+
+                <CardHeader className="pb-3 p-5 md:p-6">
+                  <div className="flex justify-between items-start gap-2">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-2">
+                        {getPriorityIcon(job.priority)}
+                        <CardTitle className="text-base sm:text-lg font-poppins group-hover:text-primary transition-colors truncate">{job.title}</CardTitle>
+                      </div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <Badge variant={getStatusBadgeVariant(job.status)} className="flex items-center gap-1 text-xs">
+                          {getStatusIcon(job.status)}
+                          {getStatusText(job.status)}
+                        </Badge>
+                        {job.priority && job.priority !== 'medium' && (
+                          <Badge variant="outline" className="text-xs">
+                            {getPriorityText(job.priority)}
+                          </Badge>
+                        )}
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <Badge variant={getStatusBadgeVariant(job.status)} className="flex items-center gap-1 text-xs">
-                        {getStatusIcon(job.status)}
-                        {getStatusText(job.status)}
-                      </Badge>
-                      {job.priority && job.priority !== 'medium' && (
-                        <Badge variant="outline" className="text-xs">
-                          {getPriorityText(job.priority)}
+                    <div className="flex gap-1 flex-shrink-0">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleEdit(job)}
+                        className="h-8 w-8 p-0 glass-subtle hover-glow active-press"
+                      >
+                        <Edit className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDelete(job)}
+                        className="h-8 w-8 p-0 glass-subtle hover-glow active-press"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-3 p-5 md:p-6 pt-0">
+                  <div>
+                    <p className="text-sm text-foreground font-semibold font-inter">{job.clientName}</p>
+                    <p className="text-sm text-muted-foreground line-clamp-1">{job.address}</p>
+                  </div>
+
+                  {job.description && (
+                    <p className="text-sm text-muted-foreground line-clamp-2">
+                      {job.description}
+                    </p>
+                  )}
+
+                  {job.tags && job.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1">
+                      {job.tags.map((tag, idx) => (
+                        <Badge key={idx} variant="secondary" className="text-xs">
+                          <Tag className="h-3 w-3 mr-1" />
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="flex justify-between items-end pt-3 border-t border-primary/10">
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-1 font-inter">
+                        {job.estimatedHours}h × {job.hourlyRate} zł/h
+                      </p>
+                      {job.category && (
+                        <Badge variant="outline" className="text-xs glass-subtle">
+                          {job.category}
                         </Badge>
                       )}
                     </div>
+                    <div className="text-right">
+                      <p className="text-xs text-muted-foreground font-inter">Wartość</p>
+                      <p className="text-lg md:text-xl font-bold bg-gradient-primary bg-clip-text text-transparent font-poppins">
+                        {job.totalCost.toLocaleString('pl-PL')} zł
+                      </p>
+                    </div>
                   </div>
-                  <div className="flex gap-1 flex-shrink-0">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleEdit(job)}
-                      className="h-8 w-8 p-0 glass-subtle hover-glow active-press"
-                    >
-                      <Edit className="h-3.5 w-3.5" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDelete(job)}
-                      className="h-8 w-8 p-0 glass-subtle hover-glow active-press"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </Button>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-3 p-5 md:p-6 pt-0">
-                <div>
-                  <p className="text-sm text-foreground font-semibold font-inter">{job.clientName}</p>
-                  <p className="text-sm text-muted-foreground line-clamp-1">{job.address}</p>
-                </div>
-                
-                {job.description && (
-                  <p className="text-sm text-muted-foreground line-clamp-2">
-                    {job.description}
-                  </p>
-                )}
 
-                {job.tags && job.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-1">
-                    {job.tags.map((tag, idx) => (
-                      <Badge key={idx} variant="secondary" className="text-xs">
-                        <Tag className="h-3 w-3 mr-1" />
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
-                )}
+                  {job.status !== 'completed' && job.status !== 'cancelled' && (
+                    <div className="flex gap-2 pt-2">
+                      {job.status === 'pending' && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="flex-1 text-xs glass-card border-primary/30 hover-glow active-press"
+                          onClick={() => handleQuickStatusChange(job, 'in-progress')}
+                        >
+                          <Activity className="h-3 w-3 mr-1" />
+                          Rozpocznij
+                        </Button>
+                      )}
+                      {job.status === 'in-progress' && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="flex-1 text-xs glass-card border-primary/30 hover-glow active-press"
+                          onClick={() => handleQuickStatusChange(job, 'completed')}
+                        >
+                          <CheckCircle className="h-3 w-3 mr-1" />
+                          Zakończ
+                        </Button>
+                      )}
+                    </div>
+                  )}
 
-                <div className="flex justify-between items-end pt-3 border-t border-primary/10">
-                  <div>
-                    <p className="text-xs text-muted-foreground mb-1 font-inter">
-                      {job.estimatedHours}h × {job.hourlyRate} zł/h
-                    </p>
-                    {job.category && (
-                      <Badge variant="outline" className="text-xs glass-subtle">
-                        {job.category}
-                      </Badge>
-                    )}
-                  </div>
-                  <div className="text-right">
-                    <p className="text-xs text-muted-foreground font-inter">Wartość</p>
-                    <p className="text-lg md:text-xl font-bold bg-gradient-primary bg-clip-text text-transparent font-poppins">
-                      {job.totalCost.toLocaleString('pl-PL')} zł
-                    </p>
-                  </div>
-                </div>
+                  {job.notes && (
+                    <div className="pt-2 border-t">
+                      <p className="text-xs text-muted-foreground line-clamp-2">
+                        💡 {job.notes}
+                      </p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
 
-                {job.status !== 'completed' && job.status !== 'cancelled' && (
-                  <div className="flex gap-2 pt-2">
-                    {job.status === 'pending' && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="flex-1 text-xs glass-card border-primary/30 hover-glow active-press"
-                        onClick={() => handleQuickStatusChange(job, 'in-progress')}
-                      >
-                        <Activity className="h-3 w-3 mr-1" />
-                        Rozpocznij
-                      </Button>
-                    )}
-                    {job.status === 'in-progress' && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="flex-1 text-xs glass-card border-primary/30 hover-glow active-press"
-                        onClick={() => handleQuickStatusChange(job, 'completed')}
-                      >
-                        <CheckCircle className="h-3 w-3 mr-1" />
-                        Zakończ
-                      </Button>
-                    )}
-                  </div>
-                )}
-
-                {job.notes && (
-                  <div className="pt-2 border-t">
-                    <p className="text-xs text-muted-foreground line-clamp-2">
-                      💡 {job.notes}
-                    </p>
-                  </div>
+          {filteredJobs.length === 0 && !isLoading && (
+            <Card className="glass-premium border-none shadow-medium">
+              <CardContent className="p-12 md:p-16 text-center">
+                <h3 className="text-lg font-medium text-muted-foreground mb-2">
+                  Brak zleceń
+                </h3>
+                <p className="text-muted-foreground mb-4">
+                  {searchTerm || statusFilter !== 'all'
+                    ? 'Nie znaleziono zleceń spełniających kryteria wyszukiwania.'
+                    : 'Utwórz swoje pierwsze zlecenie, aby rozpocząć.'
+                  }
+                </p>
+                {(!searchTerm && statusFilter === 'all') && (
+                  <Button
+                    onClick={() => {
+                      resetForm();
+                      setIsDialogOpen(true);
+                    }}
+                    className="bg-gradient-primary hover:bg-gradient-primary/90"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Utwórz zlecenie
+                  </Button>
                 )}
               </CardContent>
             </Card>
-          ))}
+          )}
         </div>
-
-        {filteredJobs.length === 0 && (
-          <Card className="glass-premium border-none shadow-medium">
-            <CardContent className="p-12 md:p-16 text-center">
-              <h3 className="text-lg font-medium text-muted-foreground mb-2">
-                Brak zleceń
-              </h3>
-              <p className="text-muted-foreground mb-4">
-                {searchTerm || statusFilter !== 'all' 
-                  ? 'Nie znaleziono zleceń spełniających kryteria wyszukiwania.'
-                  : 'Utwórz swoje pierwsze zlecenie, aby rozpocząć.'
-                }
-              </p>
-              {(!searchTerm && statusFilter === 'all') && (
-                <Button 
-                  onClick={() => {
-                    resetForm();
-                    setIsDialogOpen(true);
-                  }}
-                  className="bg-gradient-primary hover:bg-gradient-primary/90"
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Utwórz zlecenie
-                </Button>
-              )}
-            </CardContent>
-          </Card>
-        )}
-      </div>
+      )}
     </div>
   );
 }

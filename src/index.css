@@ -274,8 +274,12 @@ All colors MUST be HSL.
   }
 
   @keyframes shimmer {
-    0% { background-position: -1000px 0; }
-    100% { background-position: 1000px 0; }
+    from {
+      background-position: 200% 0;
+    }
+    to {
+      background-position: -200% 0;
+    }
   }
 
   @keyframes slide-up-fade {
@@ -359,13 +363,28 @@ All colors MUST be HSL.
     animation: pulse-glow 2s ease-in-out infinite;
   }
 
+  /* Shimmer effect for skeletons */
   .animate-shimmer {
-    background: linear-gradient(90deg, 
-      transparent, 
-      rgba(255, 255, 255, 0.4), 
-      transparent);
-    background-size: 1000px 100%;
-    animation: shimmer 2s infinite;
+    animation: shimmer 2s infinite linear;
+  }
+
+  .bg-shimmer-gradient {
+    background-image: linear-gradient(
+      to right,
+      hsl(var(--muted) / 0) 0%,
+      hsl(var(--muted) / 0.3) 50%,
+      hsl(var(--muted) / 0) 100%
+    );
+    background-size: 200% 100%;
+  }
+
+  .dark .bg-shimmer-gradient {
+    background-image: linear-gradient(
+      to right,
+      hsl(var(--muted) / 0) 0%,
+      hsl(var(--muted) / 0.2) 50%,
+      hsl(var(--muted) / 0) 100%
+    );
   }
 
   .animate-slide-up-fade {
